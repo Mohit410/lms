@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "776279327702",
+    "project_id": "lms-flutter-11014",
+    "storage_bucket": "lms-flutter-11014.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776279327702:android:0906a4133e7a163d17da77",
+        "android_client_info": {
+          "package_name": "com.shardams.lms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "776279327702-gt3bch87vbna7g01cqckcjoqid7v12ao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSTm8V_VwuchyI-FKXMyAOlMlt5uBLWWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "776279327702-gt3bch87vbna7g01cqckcjoqid7v12ao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
