@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/screens/Login/components/body.dart';
+import 'package:lms/screens/SignUp/signup_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -66,21 +66,67 @@ class _LoginScreenState extends State<LoginScreen> {
         child: const Text(
           "Login",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
 
+    Widget sizedBoxMargin(double value) {
+      return SizedBox(height: value);
+    }
+
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
+          child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(36.0),
           child: Form(
               key: _formKey,
               child: Column(
-                children: <Widget>[emailField, passwordField, loginButton],
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  sizedBoxMargin(10),
+                  const Text(
+                    "LOGIN",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                    ),
+                  ),
+                  sizedBoxMargin(45),
+                  emailField,
+                  sizedBoxMargin(15),
+                  passwordField,
+                  sizedBoxMargin(35),
+                  loginButton,
+                  sizedBoxMargin(15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Text("Don't have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpScreen()));
+                        },
+                        child: const Text(
+                          "SignUp",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 15,
+                              color: Colors.redAccent),
+                        ),
+                      )
+                    ],
+                  )
+                ],
               )),
         ),
-      ),
+      )),
     );
   }
 }
