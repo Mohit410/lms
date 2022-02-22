@@ -1,4 +1,4 @@
-# lms
+# LMS - Library Management App
 
 Library Management System
 
