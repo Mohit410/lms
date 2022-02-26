@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/screens/SignUp/signup_page.dart';
+import 'package:lms/constants.dart';
+import 'package:lms/services/authentication_service.dart';
+import 'package:provider/src/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -12,6 +15,9 @@ class _LoginScreenState extends State<LoginScreen> {
   //form key
   final _formKey = GlobalKey<FormState>();
 
+  //progress bar state
+  bool _isLoading = false;
+
   //editing controller
   final TextEditingController emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -22,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final emailField = TextFormField(
       autofocus: false,
       keyboardType: TextInputType.emailAddress,
+      controller: emailController,
       //validator: () {},
       onSaved: (value) {
         emailController.text = value!;
@@ -34,15 +41,36 @@ class _LoginScreenState extends State<LoginScreen> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Please enter your email";
+        }
+        if (!RegExp("^[a-zA-Z0-9.!#%&'*+/=?^_`{|}~-]+@lms.in")
+            .hasMatch(value)) {
+          return "Please enter a valid email";
+        }
+        return null;
+      },
     );
 
     //password field
     final passwordField = TextFormField(
       autofocus: false,
       obscureText: true,
+      controller: passwordController,
       //validator: () {},
       onSaved: (value) {
         passwordController.text = value!;
+      },
+      validator: (value) {
+        RegExp regex = RegExp(r"^.{6,}$");
+        if (value!.isEmpty) {
+          return "Password required";
+        }
+
+        if (!regex.hasMatch(value)) {
+          return "Enter valid password(Min. 6 characters)";
+        }
       },
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
@@ -62,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          logIn(emailController.text, passwordController.text);
+        },
         child: const Text(
           "Login",
           textAlign: TextAlign.center,
@@ -75,58 +105,72 @@ class _LoginScreenState extends State<LoginScreen> {
       return SizedBox(height: value);
     }
 
-    return Scaffold(
-      body: Center(
-          child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(36.0),
-          child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  sizedBoxMargin(10),
-                  const Text(
-                    "LOGIN",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                  ),
-                  sizedBoxMargin(45),
-                  emailField,
-                  sizedBoxMargin(15),
-                  passwordField,
-                  sizedBoxMargin(35),
-                  loginButton,
-                  sizedBoxMargin(15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const Text("Don't have an account? "),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SignUpScreen()));
-                        },
-                        child: const Text(
-                          "SignUp",
+    return (_isLoading)
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.arrow_back)),
+            ),
+            body: Center(
+                child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(36.0),
+                child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        sizedBoxMargin(10),
+                        const Text(
+                          "LOGIN",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15,
-                              color: Colors.redAccent),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                          ),
                         ),
-                      )
-                    ],
-                  )
-                ],
-              )),
-        ),
-      )),
-    );
+                        sizedBoxMargin(45),
+                        emailField,
+                        sizedBoxMargin(20),
+                        passwordField,
+                        sizedBoxMargin(35),
+                        loginButton,
+                        sizedBoxMargin(15),
+                      ],
+                    )),
+              ),
+            )),
+          );
+  }
+
+  void logIn(String email, String password) {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      context
+          .read<AuthenticationService>()
+          .signIn(
+            email: email.trim(),
+            password: password.trim(),
+          )
+          .then((value) => {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, homeRoute, (route) => false),
+                showSnackbar(value, context),
+              });
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
