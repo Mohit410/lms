@@ -4,26 +4,31 @@ class Book {
   int id;
   String title;
   String authorName;
-  List<String> tags;
-  String category;
-  UserModel? issuedTo;
+  //List<String> tags;
+  //String category;
+  //UserModel issuedTo;
+  String status;
 
   Book(
-      {required this.id,
-      required this.title,
-      required this.authorName,
-      required this.tags,
-      required this.category,
-      this.issuedTo});
+      //this.issuedTo,
+      {
+    required this.id,
+    required this.title,
+    required this.authorName,
+    // required this.tags,
+    // required this.category,
+    required this.status,
+  });
 
   factory Book.fromMap(map) {
     return Book(
         id: map['id'],
         title: map['title'],
         authorName: map['author'],
-        tags: map['tags'],
-        category: map['category'],
-        issuedTo: map['issued_to']);
+        // tags: map['tags'],
+        // category: map['category'],
+        status: map['status']);
+    //issuedTo: map['issued_to']);
   }
 
   Map<String, dynamic> toMap() {
@@ -31,9 +36,20 @@ class Book {
       'id': id,
       'title': title,
       'author': authorName,
-      'tags': tags,
-      'category': category,
-      'issued_to': issuedTo
+      // 'tags': tags,
+      // 'category': category,
+      'status': status
+      //'issued_to': issuedTo
     };
   }
+
+  toJson() => {
+        'id': id,
+        'title': title,
+        'author': authorName,
+        // 'tags': tags,
+        // 'category': category,
+        'status': status
+        //'issued_to': issuedTo
+      };
 }

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/constants.dart';
+import 'package:lms/utils/constants.dart';
 import 'package:lms/model/user_model.dart';
-import 'package:lms/screens/BottomNavBar/bottom_nav_bar.dart';
+import 'package:lms/screens/Navigation/bottom_nav_bar.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:provider/src/provider.dart';
+
+import '../../utils/user_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -239,6 +241,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void signUp(String email, String password) async {
     if (_formKey.currentState!.validate()) {
+      User? user;
       context
           .read<AuthenticationService>()
           .signUp(
@@ -247,6 +250,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           )
           .then((value) => {
                 postUserDetailsToFirestore(context),
+                {
+                  user = FirebaseAuth.instance.currentUser,
+                  if (user != null)
+                    {
+                      UserPreferences.saveUserPreferences(user!),
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, homeRoute, (route) => false),
+                    }
+                },
                 showSnackbar(value, context),
                 setState(() {
                   _isLoading = false;

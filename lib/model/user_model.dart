@@ -29,4 +29,14 @@ class UserModel {
       'role': userRole
     };
   }
+
+  toJson() {
+    return {
+      'uid': uid,
+      'email': email,
+      'first_name': firstName,
+      'last_name': lastName,
+      'role': userRole
+    };
+  }
 }

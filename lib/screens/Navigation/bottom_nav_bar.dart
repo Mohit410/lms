@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lms/constants.dart';
+import 'package:lms/utils/constants.dart';
 import 'package:lms/screens/Home/home_screen.dart';
 import 'package:lms/screens/Notification/notification_screen.dart';
 import 'package:lms/screens/Profile/profile_screen.dart';
+import 'package:lms/utils/user_preferences.dart';
 
 class BottomNavPanel extends StatefulWidget {
   const BottomNavPanel({Key? key}) : super(key: key);
@@ -35,14 +36,16 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
           centerTitle: true,
           automaticallyImplyLeading: false,
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(context, addBookRoute);
-          },
-          label: const Text('Add a book'),
-          icon: const Icon(Icons.add_rounded),
-          backgroundColor: Colors.blue,
-        ),
+        floatingActionButton: isAdmin()
+            ? FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(context, addBookRoute);
+                },
+                label: const Text('Add a book'),
+                icon: const Icon(Icons.add_rounded),
+                backgroundColor: Colors.blue,
+              )
+            : null,
         bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.blue,

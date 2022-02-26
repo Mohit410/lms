@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms/constants.dart';
-import 'package:lms/screens/Login/login_page.dart';
+import 'package:lms/utils/constants.dart';
+import 'package:lms/screens/Login/login_screen.dart';
 import 'package:lms/screens/SignUp/signup_page.dart';
 
 class WelcomeScreen extends StatelessWidget {

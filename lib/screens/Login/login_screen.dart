@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/constants.dart';
+import 'package:lms/model/user_model.dart';
+import 'package:lms/utils/constants.dart';
 import 'package:lms/services/authentication_service.dart';
+import 'package:lms/utils/user_preferences.dart';
 import 'package:provider/src/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -157,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
+      User? user;
       context
           .read<AuthenticationService>()
           .signIn(
@@ -164,8 +168,15 @@ class _LoginScreenState extends State<LoginScreen> {
             password: password.trim(),
           )
           .then((value) => {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, homeRoute, (route) => false),
+                {
+                  user = FirebaseAuth.instance.currentUser,
+                  if (user != null)
+                    {
+                      UserPreferences.saveUserPreferences(user!),
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, bottomNavPanelRoute, (route) => false),
+                    }
+                },
                 showSnackbar(value, context),
               });
       setState(() {
