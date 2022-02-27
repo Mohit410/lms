@@ -38,11 +38,11 @@ class _EditFormState extends State<EditForm> {
 
   @override
   Widget build(BuildContext context) {
-    Future updateUserData() async {
+    Future updateUserData() {
       setState(() {
         _isLoading = true;
       });
-      return await FirebaseFirestore.instance
+      return FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userModel.uid)
           .update(
@@ -56,7 +56,7 @@ class _EditFormState extends State<EditForm> {
         });
         showSnackbar("User details updated successfully", context);
         widget.onSaveClicked();
-      }).onError((error, stackTrace) {
+      }).catchError((error) {
         showSnackbar(error.toString(), context);
       });
     }
