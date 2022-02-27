@@ -35,6 +35,8 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
                   IndexedStack(children: _appBarWidget, index: currentIndex)),
           centerTitle: true,
           automaticallyImplyLeading: false,
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
         ),
         floatingActionButton: isAdmin()
             ? FloatingActionButton.extended(

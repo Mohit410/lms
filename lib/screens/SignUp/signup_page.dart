@@ -204,39 +204,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             body: Center(
               child: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.all(36.0),
-                child: Form(
+                child: Padding(
+                  padding: const EdgeInsets.all(36.0),
+                  child: Form(
                     key: _formKey,
                     child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          sizedBoxMargin(10),
-                          const Text(
-                            "SIGN UP",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30,
-                            ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        sizedBoxMargin(10),
+                        const Text(
+                          "SIGN UP",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
                           ),
-                          sizedBoxMargin(45),
-                          firstNameField,
-                          sizedBoxMargin(20),
-                          lastNameField,
-                          sizedBoxMargin(20),
-                          emailField,
-                          sizedBoxMargin(20),
-                          passwordField,
-                          sizedBoxMargin(20),
-                          confirmPasswordField,
-                          sizedBoxMargin(35),
-                          signupButton,
-                          sizedBoxMargin(15),
-                        ])),
-              )),
-            ));
+                        ),
+                        sizedBoxMargin(45),
+                        firstNameField,
+                        sizedBoxMargin(20),
+                        lastNameField,
+                        sizedBoxMargin(20),
+                        emailField,
+                        sizedBoxMargin(20),
+                        passwordField,
+                        sizedBoxMargin(20),
+                        confirmPasswordField,
+                        sizedBoxMargin(35),
+                        signupButton,
+                        sizedBoxMargin(15),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
   }
 
   void signUp(String email, String password) async {

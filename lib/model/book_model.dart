@@ -1,55 +1,47 @@
+import 'package:lms/model/category_model.dart';
+import 'package:lms/model/issued_to.dart';
 import 'package:lms/model/user_model.dart';
 
 class Book {
-  int id;
+  String uid;
   String title;
-  String authorName;
-  //List<String> tags;
-  //String category;
+  List<String> authors;
+  List<String> tags;
+  Category category;
+  IssuedTo? issuedTo;
+
   //UserModel issuedTo;
   String status;
 
-  Book(
-      //this.issuedTo,
-      {
-    required this.id,
+  Book({
+    required this.uid,
     required this.title,
-    required this.authorName,
-    // required this.tags,
-    // required this.category,
+    required this.authors,
+    required this.tags,
+    required this.category,
     required this.status,
+    required this.issuedTo,
   });
 
-  factory Book.fromMap(map) {
+  factory Book.fromMap(Map<String, dynamic> map) {
     return Book(
-        id: map['id'],
+        issuedTo: IssuedTo.fromMap(map['issued_to']),
+        tags: List.from(map['tags']),
+        uid: map['uid'],
         title: map['title'],
-        authorName: map['author'],
-        // tags: map['tags'],
-        // category: map['category'],
+        authors: List.from(map['authors']),
+        category: Category.fromMap(map['category']),
         status: map['status']);
-    //issuedTo: map['issued_to']);
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'author': authorName,
-      // 'tags': tags,
-      // 'category': category,
-      'status': status
-      //'issued_to': issuedTo
-    };
-  }
-
-  toJson() => {
-        'id': id,
+  Map<String, dynamic> toMap() => {
+        'uid': uid,
         'title': title,
-        'author': authorName,
-        // 'tags': tags,
-        // 'category': category,
-        'status': status
+        'authors': authors,
+        'tags': tags,
+        'category': category.toMap(),
+        'status': status,
+        'issuedTo': issuedTo?.toMap()
         //'issued_to': issuedTo
       };
 }

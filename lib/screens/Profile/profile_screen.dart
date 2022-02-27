@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/user_model.dart';
+import 'package:lms/screens/Profile/edit_form.dart';
+import 'package:lms/screens/Profile/user_details.dart';
 import 'package:lms/services/authentication_service.dart';
-import 'package:lms/utils/user_preferences.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/constants.dart';
@@ -16,91 +15,60 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  User? user = FirebaseAuth.instance.currentUser;
   UserModel userModel = UserModel();
 
-  saveUserDetails() async {}
-
-  var _isLoading = false;
+  bool _editClicked = false;
 
   void navigateTo(String route) {
     Navigator.pushNamed(context, route);
   }
 
   @override
-  void initState() {
-    setState(() {
-      _isLoading = true;
-    });
-    super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      userModel = UserModel.fromMap(value.data());
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return (_isLoading)
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
-        : Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'Welcome Back',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    "${userModel.firstName} ${userModel.lastName}",
-                    style: const TextStyle(
-                        fontSize: 10, fontWeight: FontWeight.w400),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Text(
-                    "${userModel.email}",
-                    style: const TextStyle(
-                        fontSize: 10, fontWeight: FontWeight.w400),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      logout(context);
-                    },
-                    child: const Text("Log out"),
-                  )
-                ],
-              ),
-            ),
-          );
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              _editClicked
+                  ? EditForm(
+                      userModel: userModel,
+                      onSaveClicked: () {
+                        setState(() {
+                          _editClicked = false;
+                        });
+                      },
+                      onCancelClicked: () {
+                        setState(() {
+                          _editClicked = false;
+                        });
+                      },
+                    )
+                  : UserDetail(
+                      onEditClicked: () {
+                        setState(() {
+                          _editClicked = true;
+                        });
+                      },
+                      onSignOutClicked: () {
+                        logout(context);
+                      },
+                      onGettingUserDetails: (user) {
+                        setState(() {
+                          userModel = user;
+                        });
+                      },
+                    ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void logout(BuildContext context) {
-    setState(() {
-      _isLoading = true;
-    });
     context.read<AuthenticationService>().signOut();
-    setState(() {
-      _isLoading = false;
-    });
     Navigator.pushReplacementNamed(context, welcomeRoute);
   }
 }
