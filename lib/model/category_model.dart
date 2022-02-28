@@ -7,10 +7,10 @@ class Category {
     required this.title,
   });
 
-  factory Category.fromMap(Map<String, String> map) =>
+  factory Category.fromMap(map) =>
       Category(uid: map['uid'], title: map['title']);
 
-  Map<String, String> toMap() => {
+  Map<String, dynamic> toMap() => {
         'uid': uid!,
         'title': title!,
       };

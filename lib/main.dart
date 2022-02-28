@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
           homeRoute: (_) => const HomeScreen(),
           profileRoute: (_) => const ProfileScreen(),
           notificationRoute: (_) => const NotificationScreen(),
-          bookDetailRoute: (_) => const BookDetailScreen(),
           addBookRoute: (_) => const AddBookScreen(),
         },
       ),

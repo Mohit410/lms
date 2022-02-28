@@ -28,4 +28,10 @@ class DataRepository {
       },
     );
   }
+
+  Future getBooksByQuery(String query) async {
+    return await booksCollection
+        .where('title', isGreaterThanOrEqualTo: query)
+        .get();
+  }
 }

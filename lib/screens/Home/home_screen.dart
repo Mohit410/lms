@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/model/book_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/screens/Home/components/book_card.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/services/authentication_service.dart';
@@ -17,23 +19,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
 
-  // @override
-  // void initState() {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   super.initState();
-  //   FirebaseFirestore.instance
-  //       .collection("users")
-  //       .doc(user!.uid)
-  //       .get()
-  //       .then((value) {
-  //     userModel = UserModel.fromMap(value.data());
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   });
-  // }
+  List<Book> _booksList = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getBooksData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,19 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ? const Center(
             child: CircularProgressIndicator(),
           )
-        : Center(
-            child: ElevatedButton(
-              onPressed: () => printBooksData(),
-              child: const Text("Print data"),
-            ),
-          );
+        : SafeArea(
+            child: ListView.builder(
+            itemCount: _booksList.length,
+            itemBuilder: (context, index) {
+              return BookCard(_booksList[index]);
+            },
+          ));
   }
 
-  void printBooksData() {
-    DataRepository().booksCollection.get().then((value) {
-      for (var element in value.docs) {
-        print("${element.data()}");
-      }
+  Future getBooksData() async {
+    await FirebaseFirestore.instance
+        .collection('books')
+        .orderBy('title')
+        .get()
+        .then((doc) {
+      setState(() {
+        _booksList = doc.docs.map((e) => Book.fromMap(e.data())).toList();
+      });
     });
   }
 }
