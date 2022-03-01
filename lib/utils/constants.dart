@@ -16,6 +16,7 @@ const notificationRoute = "\notification";
 const profileRoute = "\profile";
 const addBookRoute = "\add_book";
 const bookDetailRoute = "\book_detail";
+const booksListRoute = "\books_list_screen";
 
 // shared preferences key
 const userFNameKey = 'first_name';

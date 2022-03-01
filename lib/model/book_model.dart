@@ -48,7 +48,7 @@ class Book {
         'tags': tags,
         'category': category?.toMap(),
         'status': status,
-        'issuedTo': issuedTo?.toMap(),
+        'issued_to': issuedTo?.toMap(),
         'requested_by': requestedBy?.toMap(),
       };
 }

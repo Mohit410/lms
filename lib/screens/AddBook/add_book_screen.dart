@@ -7,7 +7,8 @@ import 'package:lms/utils/constants.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
 class AddBookScreen extends StatefulWidget {
-  const AddBookScreen({Key? key}) : super(key: key);
+  Book? book;
+  AddBookScreen(this.book, {Key? key}) : super(key: key);
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
@@ -18,18 +19,14 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   final List<String> _tagList = [];
   final List<String> _authorsList = [];
-  final List<String> _categoryList = [];
   Category? _category;
-
-  final bookTitleController = TextEditingController();
-  final bookAuthorController = TextEditingController();
-  final categoryController = TextEditingController();
-  final tagsController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final bookTitleController = TextEditingController(text: widget.book?.title);
+
     final titleField = TextFormField(
       controller: bookTitleController,
       textInputAction: TextInputAction.next,
@@ -57,7 +54,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
 
     final authorTagField = TextFieldTags(
-      initialTags: _authorsList,
+      initialTags: widget.book?.authors,
       textSeparators: const [","],
       tagsStyler: TagsStyler(
         tagTextStyle: const TextStyle(
@@ -100,35 +97,10 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
 
     final categoryDropdownBtn = CategoryDropDown(
-      _category,
+      widget.book?.category,
       onCategoryChanged: (value) {
         _category = value;
       },
-    );
-
-    final categoryField = TextFormField(
-      controller: categoryController,
-      textInputAction: TextInputAction.next,
-      autofocus: false,
-      keyboardType: TextInputType.text,
-      onSaved: (value) {
-        categoryController.text = value!;
-      },
-      validator: (value) {
-        if (value!.isEmpty) return "Category cannot be empty";
-        if (value.length < 3) {
-          return "Min 3 character required";
-        }
-      },
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.category_rounded),
-        contentPadding: EdgeInsets.zero,
-        label: const Text("Category"),
-        hintText: "Enter Book Category",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
     );
 
     final tagsField = TextFieldTags(

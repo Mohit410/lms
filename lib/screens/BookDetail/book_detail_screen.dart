@@ -2,13 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/book_model.dart';
+import 'package:lms/model/reader_model.dart';
+import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/screens/AddBook/add_book_screen.dart';
 import 'package:lms/utils/user_preferences.dart';
 
 class BookDetailScreen extends StatefulWidget {
-  String bookUid;
-  BookDetailScreen(
-    this.bookUid, {
+  BookDetailScreen({
     Key? key,
   }) : super(key: key);
 
@@ -19,6 +20,9 @@ class BookDetailScreen extends StatefulWidget {
 class _BookDetailScreenState extends State<BookDetailScreen> {
   Book book = Book();
 
+  var user = FirebaseAuth.instance.currentUser;
+  late UserModel userModel;
+
   bool _isLoading = false;
   bool _showRequestBtn = false;
   bool _showApproveBtn = false;
@@ -26,14 +30,75 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   bool _showCancelRequestBtn = false;
   bool _showDepositeBtn = false;
 
-  @override
-  void initState() {
-    super.initState();
+  void checkButtons() {
+    if (isAdmin()) {
+      _showApproveBtn = book.requestedBy != null;
+      _showDeclineBtn = book.requestedBy != null;
+      _showRequestBtn = false;
+      _showDepositeBtn = false;
+      _showCancelRequestBtn = false;
+    } else {
+      _showApproveBtn = false;
+      _showDeclineBtn = false;
+      _showRequestBtn = (book.issuedTo == null && book.requestedBy == null);
+      _showDepositeBtn =
+          (book.issuedTo != null && book.issuedTo?.uid == user?.uid);
+      _showCancelRequestBtn =
+          (book.requestedBy != null && book.requestedBy?.uid == user?.uid);
+    }
+  }
+
+  requestBook() async {
+    final requestedBy = Reader(
+      name:
+          "${UserPreferences.getUserFName()} ${UserPreferences.getUserLName()}",
+      uid: UserPreferences.getUserUid(),
+    );
+
+    await DataRepository()
+        .booksCollection
+        .doc(book.uid)
+        .update({'requested_by': requestedBy.toMap()});
+
+    checkButtons();
+  }
+
+  cancelRequest() async {
+    await DataRepository()
+        .booksCollection
+        .doc(book.uid)
+        .update({'requested_by': null});
+  }
+
+  approveRequest() async {
+    await DataRepository().booksCollection.doc(book.uid).update({
+      'issued_to': book.requestedBy?.toMap(),
+      'requested_by': null,
+    });
+  }
+
+  declineRequest() async {
+    await DataRepository().booksCollection.doc(book.uid).update({
+      'requested_by': null,
+    });
+  }
+
+  depositeBook() async {
+    await DataRepository().booksCollection.doc(book.uid).update({
+      'issued_to': null,
+    });
+  }
+
+  onEditClicked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddBookScreen(book)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var user = FirebaseAuth.instance.currentUser;
+    final _bookUid = ModalRoute.of(context)!.settings.arguments as String;
 
     final requestButton = Material(
       elevation: 5,
@@ -43,7 +108,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          //todo
+          requestBook();
         },
         child: const Text(
           "REQUEST BOOK",
@@ -55,16 +120,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
     final cancelRequestButton = Material(
       elevation: 5,
-      color: Colors.blue.shade800,
+      color: Colors.redAccent.shade400,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          //todo
+          cancelRequest();
         },
         child: const Text(
-          "REQUEST BOOK",
+          "CANCEL REQUEST",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
@@ -79,13 +144,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          setState(() {
-            _isLoading = false;
-          });
-          //todo
-          setState(() {
-            _isLoading = true;
-          });
+          depositeBook();
         },
         child: const Text(
           "DEPOSITE",
@@ -97,19 +156,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
     final approvebutton = Material(
       elevation: 5,
-      color: Colors.redAccent,
+      color: Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          setState(() {
-            _isLoading = false;
-          });
-          //todo
-          setState(() {
-            _isLoading = true;
-          });
+          approveRequest();
         },
         child: const Text(
           "APPROVE REQUEST",
@@ -127,13 +180,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          setState(() {
-            _isLoading = false;
-          });
-          //todo
-          setState(() {
-            _isLoading = true;
-          });
+          declineRequest();
         },
         child: const Text(
           "DECLINE REQUEST",
@@ -147,8 +194,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           value,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w300,
-            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade400,
           ),
           textAlign: TextAlign.start,
         );
@@ -169,25 +216,26 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
     List<Widget> getBtnList() {
       List<Widget> btnList = [];
+      checkButtons();
       if (_showRequestBtn) {
         btnList.add(requestButton);
-        sizedBoxMargin(20);
+        btnList.add(sizedBoxMargin(20));
       }
       if (_showCancelRequestBtn) {
         btnList.add(cancelRequestButton);
-        sizedBoxMargin(20);
+        btnList.add(sizedBoxMargin(20));
       }
       if (_showDepositeBtn) {
-        btnList.add(declinebutton);
-        sizedBoxMargin(20);
+        btnList.add(depositebutton);
+        btnList.add(sizedBoxMargin(20));
       }
       if (_showApproveBtn) {
         btnList.add(approvebutton);
-        sizedBoxMargin(20);
+        btnList.add(sizedBoxMargin(20));
       }
       if (_showDeclineBtn) {
         btnList.add(declinebutton);
-        sizedBoxMargin(20);
+        btnList.add(sizedBoxMargin(20));
       }
 
       return btnList;
@@ -201,7 +249,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         sizedBoxMargin(20),
         headingText("Auhtors"),
         sizedBoxMargin(10),
-        Column(
+        Row(
           children: book.authors!.map((e) {
             return fieldText(e);
           }).toList(),
@@ -210,6 +258,33 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         headingText("Category"),
         sizedBoxMargin(10),
         fieldText(book.category?.title ?? " "),
+        sizedBoxMargin(20),
+        headingText("Availability"),
+        sizedBoxMargin(10),
+        fieldText((book.issuedTo == null) ? "Available" : "Not Available"),
+        sizedBoxMargin(20),
+        (book.issuedTo != null)
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  headingText("Issued To"),
+                  sizedBoxMargin(10),
+                  fieldText(book.issuedTo?.name ?? ""),
+                  sizedBoxMargin(20),
+                ],
+              )
+            : Container(),
+        (book.requestedBy != null)
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  headingText("Requested By"),
+                  sizedBoxMargin(10),
+                  fieldText(book.requestedBy?.name ?? ""),
+                  sizedBoxMargin(20),
+                ],
+              )
+            : Container(),
         sizedBoxMargin(40),
       ];
 
@@ -219,10 +294,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Book Details"),
+      ),
       floatingActionButton: (isAdmin())
           ? FloatingActionButton.extended(
-              onPressed: () {},
+              onPressed: () {
+                onEditClicked();
+              },
               label: const Text("Edit"),
               icon: const Icon(Icons.edit),
               backgroundColor: Colors.blue,
@@ -232,8 +311,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: FutureBuilder<DocumentSnapshot>(
-              future: DataRepository().getBookByUid(widget.bookUid),
+            child: StreamBuilder<DocumentSnapshot>(
+              stream:
+                  DataRepository().booksCollection.doc(_bookUid).snapshots(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasError) {
                   return const Text("Something went wrong");
@@ -243,37 +323,18 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   return const Text("Book does not exist");
                 }
 
-                if (snapshot.connectionState == ConnectionState.done) {
-                  var map = snapshot.data!.data() as Map<String, dynamic>;
-                  setState(() {
-                    book = Book.fromMap(map);
-                  });
-                  setState(() {
-                    if (isAdmin()) {
-                      _showApproveBtn = book.requestedBy != null;
-                      _showDeclineBtn = book.requestedBy != null;
-                      _showRequestBtn = false;
-                      _showDepositeBtn = false;
-                      _showCancelRequestBtn = false;
-                    } else {
-                      _showApproveBtn = false;
-                      _showDeclineBtn = false;
-                      _showRequestBtn =
-                          (book.issuedTo == null && book.requestedBy == null);
-                      _showDepositeBtn = (book.issuedTo != null &&
-                          book.issuedTo?.uid == user?.uid);
-                      _showCancelRequestBtn = (book.requestedBy != null &&
-                          book.requestedBy?.uid == user?.uid);
-                    }
-                  });
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: getBookDetailsList(book),
-                  );
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
                 }
 
-                return const CircularProgressIndicator();
+                var map = snapshot.data!.data() as Map<String, dynamic>;
+                book = Book.fromMap(map);
+
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: getBookDetailsList(book),
+                );
               },
             ),
           ),

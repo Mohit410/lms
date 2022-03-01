@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:lms/model/book_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/screens/Home/books_search_screen.dart';
 import 'package:lms/screens/Navigation/bottom_nav_bar.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/screens/BookDetail/book_detail_screen.dart';
@@ -53,7 +55,9 @@ class MyApp extends StatelessWidget {
           homeRoute: (_) => const HomeScreen(),
           profileRoute: (_) => const ProfileScreen(),
           notificationRoute: (_) => const NotificationScreen(),
-          addBookRoute: (_) => const AddBookScreen(),
+          addBookRoute: (_) => AddBookScreen(Book()),
+          bookDetailRoute: (_) => BookDetailScreen(),
+          booksListRoute: (_) => const BooksSearchScreen(),
         },
       ),
     );

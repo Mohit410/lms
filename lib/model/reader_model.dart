@@ -2,17 +2,17 @@ class Reader {
   String? uid;
   String? name;
 
-  Reader({String? name, String? uid});
+  Reader({this.name, this.uid});
 
   factory Reader.fromMap(map) {
     return Reader(
-      uid: map['uid'] as String,
-      name: map['name'] as String,
+      uid: map['uid'],
+      name: map['name'],
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'uid': uid!,
-        'name': name!,
+        'uid': uid,
+        'name': name,
       };
 }

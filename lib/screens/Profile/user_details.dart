@@ -94,8 +94,8 @@ class _UserDetailState extends State<UserDetail> {
           value,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w300,
-            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade400,
           ),
           textAlign: TextAlign.start,
         );

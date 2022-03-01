@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:lms/model/book_model.dart';
 
 class DataRepository {
@@ -12,9 +11,26 @@ class DataRepository {
   final CollectionReference categoriesCollection =
       FirebaseFirestore.instance.collection("categories");
 
-  Stream<QuerySnapshot> getStream() => usersCollection.snapshots();
+  Stream<QuerySnapshot> getUsersStream() => usersCollection.snapshots();
+
+  Stream<QuerySnapshot> getBooksStreamByCategory(String categoryUid) =>
+      booksCollection
+          .where(
+            'category.uid',
+            isEqualTo: categoryUid,
+          )
+          .snapshots();
+
+  Stream<QuerySnapshot> getBooksStreamByQuery(String query) => booksCollection
+      .where(
+        'title',
+        isGreaterThanOrEqualTo: query,
+      )
+      .snapshots();
 
   Stream<QuerySnapshot> getBooksStream() => booksCollection.snapshots();
+
+  Stream<QuerySnapshot> getCategoryStream() => categoriesCollection.snapshots();
 
   Future<DocumentSnapshot> getBookByUid(String uid) =>
       booksCollection.doc(uid).get();

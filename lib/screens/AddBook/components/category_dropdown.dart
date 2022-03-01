@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
@@ -42,15 +41,8 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
 
   @override
   Widget build(BuildContext context) {
-    // return StreamBuilder<QuerySnapshot>(
-    //   stream: DataRepository().categoriesCollection.snapshots(),
-    //   builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    //     if (!snapshot.hasData) {
-    //       return const Center(child: CircularProgressIndicator());
-    //     }
     getCategories();
     final width = MediaQuery.of(context).size.width;
-    const padding = 24;
     return Container(
       width: width,
       padding: const EdgeInsets.only(bottom: 16),
@@ -70,11 +62,11 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
             (value) {
               return DropdownMenuItem<Category>(
                 value: value,
-                child: Container(
+                child: SizedBox(
                   width: width * .50,
                   child: Text(
                     "${value.title}",
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               );
