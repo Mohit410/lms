@@ -28,20 +28,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-          child: SizedBox(
-            child: const Center(
-              child: Text(
-                "Select A Category",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+        SizedBox(
+          child: const Center(
+            child: Text(
+              "Select A Category",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            width: MediaQuery.of(context).size.width,
           ),
+          width: MediaQuery.of(context).size.width,
         ),
         StreamBuilder(
           stream: DataRepository().getCategoryStream(),

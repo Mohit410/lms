@@ -7,6 +7,7 @@ import 'package:lms/screens/Navigation/bottom_nav_bar.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:provider/src/provider.dart';
 
+import '../../main.dart';
 import '../../utils/user_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -243,7 +244,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
   }
 
-  void signUp(String email, String password) async {
+  Future signUp(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       User? user;
       context
@@ -252,22 +253,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             email: email,
             password: password,
           )
-          .then((value) => {
-                postUserDetailsToFirestore(context),
-                {
-                  user = FirebaseAuth.instance.currentUser,
-                  if (user != null)
-                    {
-                      UserPreferences.saveUserPreferences(user!),
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, homeRoute, (route) => false),
-                    }
-                },
-                showSnackbar(value, context),
-                setState(() {
-                  _isLoading = false;
-                })
-              });
+          .then((value) async {
+        await postUserDetailsToFirestore(context);
+        user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await UserPreferences.saveUserPreferences(user!);
+          admin = isAdmin();
+          Navigator.pushNamedAndRemoveUntil(
+              context, homeRoute, (route) => false);
+        }
+        showSnackbar(value, context);
+        setState(() {
+          _isLoading = false;
+        });
+      });
       // await _auth
       //     .createUserWithEmailAndPassword(email: email, password: password)
       //     .then((value) => postUserDetailsToFirestore())

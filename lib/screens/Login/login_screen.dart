@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/main.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/services/authentication_service.dart';
@@ -167,18 +168,16 @@ class _LoginScreenState extends State<LoginScreen> {
             email: email.trim(),
             password: password.trim(),
           )
-          .then((value) => {
-                {
-                  user = FirebaseAuth.instance.currentUser,
-                  if (user != null)
-                    {
-                      UserPreferences.saveUserPreferences(user!),
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, bottomNavPanelRoute, (route) => false),
-                    }
-                },
-                showSnackbar(value, context),
-              });
+          .then((value) async {
+        user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await UserPreferences.saveUserPreferences(user!);
+          admin = isAdmin();
+          Navigator.pushNamedAndRemoveUntil(
+              context, bottomNavPanelRoute, (route) => false);
+        }
+        showSnackbar(value, context);
+      });
       setState(() {
         _isLoading = false;
       });

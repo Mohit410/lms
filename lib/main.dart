@@ -19,10 +19,12 @@ import 'screens/AddBook/add_book_screen.dart';
 import 'screens/Notification/notification_screen.dart';
 import 'screens/Profile/profile_screen.dart';
 
+var admin = false;
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await UserPreferences.init();
   await Firebase.initializeApp();
+  await UserPreferences.init();
 
   runApp(const MyApp());
 }
@@ -55,7 +57,7 @@ class MyApp extends StatelessWidget {
           homeRoute: (_) => const HomeScreen(),
           profileRoute: (_) => const ProfileScreen(),
           notificationRoute: (_) => const NotificationScreen(),
-          addBookRoute: (_) => AddBookScreen(Book()),
+          addBookRoute: (_) => AddBookScreen(),
           bookDetailRoute: (_) => BookDetailScreen(),
           booksListRoute: (_) => const BooksSearchScreen(),
         },
@@ -72,6 +74,7 @@ class AuthWrapper extends StatelessWidget {
     final firebaseUser = context.watch<User?>();
 
     if (firebaseUser != null) {
+      admin = isAdmin();
       return const BottomNavPanel();
     }
     return const WelcomeScreen();

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/main.dart';
 import 'package:lms/model/book_model.dart';
 import 'package:lms/model/reader_model.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
 import 'package:lms/screens/AddBook/add_book_screen.dart';
+import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/user_preferences.dart';
 
 class BookDetailScreen extends StatefulWidget {
@@ -31,7 +33,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   bool _showDepositeBtn = false;
 
   void checkButtons() {
-    if (isAdmin()) {
+    if (admin) {
       _showApproveBtn = book.requestedBy != null;
       _showDeclineBtn = book.requestedBy != null;
       _showRequestBtn = false;
@@ -90,10 +92,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   }
 
   onEditClicked() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddBookScreen(book)),
-    );
+    Navigator.pushNamed(context, addBookRoute, arguments: book);
   }
 
   @override
@@ -297,7 +296,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       appBar: AppBar(
         title: const Text("Book Details"),
       ),
-      floatingActionButton: (isAdmin())
+      floatingActionButton: (admin)
           ? FloatingActionButton.extended(
               onPressed: () {
                 onEditClicked();

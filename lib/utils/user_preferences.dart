@@ -28,13 +28,13 @@ class UserPreferences {
 
   static String getUserUid() => _preferences?.getString(userUidKey) ?? "";
 
-  static String getUserRole() => _preferences?.getString(userRoleKey) ?? userR;
+  static String? getUserRole() => _preferences?.getString(userRoleKey);
 
   static Future clearPreferences() async => await _preferences?.clear();
 
-  static void saveUserPreferences(User user) {
+  static Future saveUserPreferences(User user) async {
     UserModel userModel;
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("users")
         .doc(user.uid)
         .get()

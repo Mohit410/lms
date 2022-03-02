@@ -7,25 +7,62 @@ import 'package:lms/utils/constants.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
 class AddBookScreen extends StatefulWidget {
-  Book? book;
-  AddBookScreen(this.book, {Key? key}) : super(key: key);
+  AddBookScreen({Key? key}) : super(key: key);
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
 }
 
 class _AddBookScreenState extends State<AddBookScreen> {
+  Book? book = Book();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _category = book?.category;
+    });
+
+    getCategoryList();
+  }
+
+  getCategoryList() async {
+    await getCategories().then((value) {
+      setState(() {
+        _categoryList = value;
+      });
+    });
+  }
+
   var _isLoading = false;
 
-  final List<String> _tagList = [];
-  final List<String> _authorsList = [];
+  List<String> _tagList = [];
+  List<String> _authorsList = [];
+  List<Category> _categoryList = [];
   Category? _category;
 
   final _formKey = GlobalKey<FormState>();
 
+  Future<List<Category>> getCategories() async {
+    var qShot = await DataRepository().categoriesCollection.get();
+
+    return qShot.docs
+        .map((doc) => Category(uid: doc.get('uid'), title: doc.get('title')))
+        .toList();
+  }
+
+  final bookTitleController = TextEditingController(text: "");
+
   @override
   Widget build(BuildContext context) {
-    final bookTitleController = TextEditingController(text: widget.book?.title);
+    setState(() {
+      book = ModalRoute.of(context)?.settings.arguments as Book?;
+      if (book != null) {
+        bookTitleController.text = book!.title!;
+        _tagList.addAll(book!.tags!);
+        _authorsList.addAll(book!.authors!);
+      }
+    });
 
     final titleField = TextFormField(
       controller: bookTitleController,
@@ -54,7 +91,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
 
     final authorTagField = TextFieldTags(
-      initialTags: widget.book?.authors,
+      initialTags: book?.authors ?? _authorsList,
       textSeparators: const [","],
       tagsStyler: TagsStyler(
         tagTextStyle: const TextStyle(
@@ -67,12 +104,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
         ),
         tagDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: Colors.red.shade200,
+          color: Colors.red.shade400,
         ),
       ),
       textFieldStyler: TextFieldStyler(
         hintText: "Enter Author Names",
-        helperText: "",
+        helperText: "Enter , to seperate Authors",
         textFieldBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -96,15 +133,39 @@ class _AddBookScreenState extends State<AddBookScreen> {
       },
     );
 
-    final categoryDropdownBtn = CategoryDropDown(
-      widget.book?.category,
-      onCategoryChanged: (value) {
-        _category = value;
-      },
-    );
+    final categoryDropdownBtn = Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        width: MediaQuery.of(context).size.width,
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: DropdownButton<Category>(
+              underline: Container(),
+              isExpanded: true,
+              items: _categoryList.map<DropdownMenuItem<Category>>((cate) {
+                return DropdownMenuItem<Category>(
+                  value: cate,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    child: Text(
+                      "${cate.title}",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              }).toList(),
+              value: _category,
+              onChanged: (value) {
+                setState(() {
+                  _category = value;
+                });
+              },
+            )));
 
     final tagsField = TextFieldTags(
-      initialTags: _tagList,
+      initialTags: book?.tags ?? _tagList,
       textSeparators: const [","],
       tagsStyler: TagsStyler(
         tagTextStyle: const TextStyle(
@@ -117,12 +178,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
         ),
         tagDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: Colors.red.shade200,
+          color: Colors.red.shade400,
         ),
       ),
       textFieldStyler: TextFieldStyler(
         hintText: "Enter Associated Tags",
-        helperText: "",
+        helperText: "Enter , to separate tags",
         textFieldBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -143,22 +204,36 @@ class _AddBookScreenState extends State<AddBookScreen> {
       setState(() {
         _isLoading = true;
       });
-      Book book = Book(
-        uid: "uid",
+      Book _book = Book(
+        uid: (book == null) ? "uid" : book!.uid,
         title: bookTitleController.text,
         authors: _authorsList.toSet().toList(),
         tags: _tagList.toSet().toList(),
         category: _category!,
         status: "in",
-        issuedTo: null,
       );
 
-      DataRepository().addBook(book).then((value) {
+      final result = (book == null)
+          ? DataRepository().addBook(_book)
+          : DataRepository().updateBook(_book);
+
+      await result.then(
+        (value) {
+          setState(() {
+            _isLoading = false;
+          });
+          showSnackbar(
+              (book == null)
+                  ? "Book added successfully"
+                  : "Book Updated Successfully",
+              context);
+          Navigator.pop(context);
+        },
+      ).catchError((error) {
         setState(() {
           _isLoading = false;
         });
-        showSnackbar("Book added successfully", context);
-        Navigator.pop(context);
+        showSnackbar("Something went wrong", context);
       });
     }
 
@@ -209,7 +284,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         categoryDropdownBtn,
                         sizedBoxMargin(20),
                         authorTagField,
+                        sizedBoxMargin(20),
                         tagsField,
+                        sizedBoxMargin(40),
                         submitButton
                       ],
                     ),

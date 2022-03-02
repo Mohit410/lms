@@ -4,9 +4,12 @@ import 'package:lms/repository/data_repository.dart';
 
 class CategoryDropDown extends StatefulWidget {
   Category? _category;
-  final Function(Category) onCategoryChanged;
-  CategoryDropDown(this._category, {Key? key, required this.onCategoryChanged})
-      : super(key: key);
+  Function(Category) onCategoryChanged;
+  CategoryDropDown(
+    this._category, {
+    Key? key,
+    required this.onCategoryChanged,
+  }) : super(key: key);
 
   @override
   State<CategoryDropDown> createState() => _CategoryDropDownState();
@@ -20,14 +23,15 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      category = widget._category;
-      if (category != null) widget.onCategoryChanged(category!);
-    });
     getCategories().then((value) {
       setState(() {
         categoryList = value;
       });
+    });
+    setState(() {
+      category = categoryList.firstWhere(
+          (element) => element.toString() == widget._category.toString());
+      if (category != null) widget.onCategoryChanged(category!);
     });
   }
 
@@ -41,7 +45,6 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
 
   @override
   Widget build(BuildContext context) {
-    getCategories();
     final width = MediaQuery.of(context).size.width;
     return Container(
       width: width,
@@ -52,20 +55,22 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
           hint: const Text("Select Category"),
           onChanged: (value) {
             setState(() {
-              widget._category = value;
-              category = value;
-              widget.onCategoryChanged(value!);
+              if (value != null) {
+                widget._category = value;
+                category = value;
+                widget.onCategoryChanged(value);
+              }
             });
           },
-          value: category,
+          value: category ?? categoryList[0],
           items: categoryList.map<DropdownMenuItem<Category>>(
-            (value) {
+            (cate) {
               return DropdownMenuItem<Category>(
-                value: value,
+                value: cate,
                 child: SizedBox(
                   width: width * .50,
                   child: Text(
-                    "${value.title}",
+                    "${cate.title}",
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),

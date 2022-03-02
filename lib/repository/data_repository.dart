@@ -45,6 +45,10 @@ class DataRepository {
     );
   }
 
+  Future<void> updateBook(Book book) async {
+    return await booksCollection.doc(book.uid).update(book.toMap());
+  }
+
   Future getBooksByQuery(String query) async {
     return await booksCollection
         .where('title', isGreaterThanOrEqualTo: query)

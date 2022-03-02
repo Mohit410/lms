@@ -13,8 +13,6 @@ class BottomNavPanel extends StatefulWidget {
 }
 
 class _BottomNavPanelState extends State<BottomNavPanel> {
-  final _isAdmin = isAdmin();
-
   int currentIndex = 0;
   final _widgteOptions = <Widget>[
     const HomeScreen(),
@@ -40,16 +38,6 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
         ),
-        floatingActionButton: _isAdmin
-            ? FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.pushNamed(context, addBookRoute);
-                },
-                label: const Text('Add a book'),
-                icon: const Icon(Icons.add_rounded),
-                backgroundColor: Colors.blue,
-              )
-            : null,
         bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.blue,
