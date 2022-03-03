@@ -200,40 +200,42 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
 
     addBookToCollection() async {
-      setState(() {
-        _isLoading = true;
-      });
-      Book _book = Book(
-        uid: (book == null) ? "uid" : book!.uid,
-        title: bookTitleController.text,
-        authors: _authorsList.toSet().toList(),
-        tags: _tagList.toSet().toList(),
-        category: _category!,
-        status: "in",
-      );
+      if (_formKey.currentState!.validate()) {
+        setState(() {
+          _isLoading = true;
+        });
+        Book _book = Book(
+          uid: (book == null) ? "uid" : book!.uid,
+          title: bookTitleController.text,
+          authors: _authorsList.toSet().toList(),
+          tags: _tagList.toSet().toList(),
+          category: _category!,
+          status: "in",
+        );
 
-      final result = (book == null)
-          ? DataRepository().addBook(_book)
-          : DataRepository().updateBook(_book);
+        final result = (book == null)
+            ? DataRepository().addBook(_book)
+            : DataRepository().updateBook(_book);
 
-      await result.then(
-        (value) {
+        await result.then(
+          (value) {
+            setState(() {
+              _isLoading = false;
+            });
+            showSnackbar(
+                (book == null)
+                    ? "Book added successfully"
+                    : "Book Updated Successfully",
+                context);
+            Navigator.pop(context);
+          },
+        ).catchError((error) {
           setState(() {
             _isLoading = false;
           });
-          showSnackbar(
-              (book == null)
-                  ? "Book added successfully"
-                  : "Book Updated Successfully",
-              context);
-          Navigator.pop(context);
-        },
-      ).catchError((error) {
-        setState(() {
-          _isLoading = false;
+          showSnackbar("Something went wrong", context);
         });
-        showSnackbar("Something went wrong", context);
-      });
+      }
     }
 
     final submitButton = Material(

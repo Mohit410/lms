@@ -49,6 +49,8 @@ dependencies:
 
   #textfield tags
   textfield_tags: ^1.4.2
+  firebase_messaging: ^11.2.8
+  flutter_local_notifications: ^9.3.3
 
 dev_dependencies:
   flutter_test:
