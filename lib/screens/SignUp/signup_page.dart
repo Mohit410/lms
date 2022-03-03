@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/model/user_model.dart';
-import 'package:lms/screens/Navigation/bottom_nav_bar.dart';
 import 'package:lms/services/authentication_service.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
 import '../../main.dart';

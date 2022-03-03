@@ -1,6 +1,5 @@
 import 'package:lms/model/category_model.dart';
 import 'package:lms/model/reader_model.dart';
-import 'package:lms/model/user_model.dart';
 
 class Book {
   String? uid;

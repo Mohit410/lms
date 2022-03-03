@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
-import 'package:lms/screens/Home/books_search_screen.dart';
 import 'package:lms/utils/constants.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -13,11 +12,8 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  bool _isCategorySelected = false;
-
   @override
   void initState() {
-    _isCategorySelected = false;
     super.initState();
   }
 

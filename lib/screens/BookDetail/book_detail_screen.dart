@@ -6,12 +6,11 @@ import 'package:lms/model/book_model.dart';
 import 'package:lms/model/reader_model.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
-import 'package:lms/screens/AddBook/add_book_screen.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/user_preferences.dart';
 
 class BookDetailScreen extends StatefulWidget {
-  BookDetailScreen({
+  const BookDetailScreen({
     Key? key,
   }) : super(key: key);
 
@@ -25,7 +24,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   var user = FirebaseAuth.instance.currentUser;
   late UserModel userModel;
 
-  bool _isLoading = false;
   bool _showRequestBtn = false;
   bool _showApproveBtn = false;
   bool _showDeclineBtn = false;
@@ -241,6 +239,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     }
 
     List<Widget> getBookDetailsList(Book book) {
+      String authors = "";
+      for (var author in book.authors!) {
+        authors += author + ", ";
+      }
+      authors = authors.endsWith(", ")
+          ? authors.substring(0, authors.length - 2)
+          : " ";
       List<Widget> list = <Widget>[
         headingText("Title"),
         sizedBoxMargin(10),
@@ -248,11 +253,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         sizedBoxMargin(20),
         headingText("Auhtors"),
         sizedBoxMargin(10),
-        Row(
-          children: book.authors!.map((e) {
-            return fieldText(e);
-          }).toList(),
-        ),
+        fieldText(authors),
         sizedBoxMargin(20),
         headingText("Category"),
         sizedBoxMargin(10),

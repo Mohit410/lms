@@ -20,8 +20,6 @@ class EditForm extends StatefulWidget {
 }
 
 class _EditFormState extends State<EditForm> {
-  bool _isLoading = false;
-
   final _formKey = GlobalKey<FormState>();
 
   var firstNameController = TextEditingController();
@@ -39,9 +37,7 @@ class _EditFormState extends State<EditForm> {
   @override
   Widget build(BuildContext context) {
     Future updateUserData() {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() {});
       return FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userModel.uid)
@@ -51,9 +47,7 @@ class _EditFormState extends State<EditForm> {
           'last_name': lastNameController.text
         },
       ).then((value) {
-        setState(() {
-          _isLoading = true;
-        });
+        setState(() {});
         showSnackbar("User details updated successfully", context);
         widget.onSaveClicked();
       }).catchError((error) {

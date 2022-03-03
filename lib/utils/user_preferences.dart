@@ -48,7 +48,4 @@ class UserPreferences {
   }
 }
 
-bool isAdmin() {
-  print("******${UserPreferences.getUserRole()}*******");
-  return UserPreferences.getUserRole() == adminR;
-}
+bool isAdmin() => UserPreferences.getUserRole() == adminR;

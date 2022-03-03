@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/main.dart';
-import 'package:lms/model/user_model.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:lms/utils/user_preferences.dart';
+// ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -67,11 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
         passwordController.text = value!;
       },
       validator: (value) {
-        RegExp regex = RegExp(r"^.{6,}$");
         if (value!.isEmpty) {
           return "Password required";
         }
-
+        RegExp regex = RegExp(r"^.{6,}$");
         if (!regex.hasMatch(value)) {
           return "Enter valid password(Min. 6 characters)";
         }

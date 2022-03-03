@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:lms/model/book_model.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
-import 'package:lms/screens/AddBook/components/category_dropdown.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
 class AddBookScreen extends StatefulWidget {
-  AddBookScreen({Key? key}) : super(key: key);
+  const AddBookScreen({Key? key}) : super(key: key);
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
@@ -36,8 +35,8 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   var _isLoading = false;
 
-  List<String> _tagList = [];
-  List<String> _authorsList = [];
+  final List<String> _tagList = [];
+  final List<String> _authorsList = [];
   List<Category> _categoryList = [];
   Category? _category;
 

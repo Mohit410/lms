@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lms/utils/constants.dart';
 import 'package:lms/screens/Home/home_screen.dart';
 import 'package:lms/screens/Notification/notification_screen.dart';
 import 'package:lms/screens/Profile/profile_screen.dart';
-import 'package:lms/utils/user_preferences.dart';
 
 class BottomNavPanel extends StatefulWidget {
   const BottomNavPanel({Key? key}) : super(key: key);
