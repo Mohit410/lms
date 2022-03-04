@@ -54,4 +54,14 @@ class DataRepository {
         .where('title', isGreaterThanOrEqualTo: query)
         .get();
   }
+
+  Future<String> getUserOSToken(String uid) async {
+    var playerId = "";
+    await usersCollection.doc(uid).get().then((value) {
+      final map = value.data() as Map<String, dynamic>;
+      playerId = map["tokens"];
+    });
+
+    return playerId;
+  }
 }

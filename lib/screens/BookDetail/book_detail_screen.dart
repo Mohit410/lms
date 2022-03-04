@@ -6,6 +6,7 @@ import 'package:lms/model/book_model.dart';
 import 'package:lms/model/reader_model.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/services/notification_services.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/user_preferences.dart';
 
@@ -58,7 +59,32 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     await DataRepository()
         .booksCollection
         .doc(book.uid)
-        .update({'requested_by': requestedBy.toMap()});
+        .update({'requested_by': requestedBy.toMap()}).then((_) async {
+      List<String> adminsTokenList = [];
+      await DataRepository()
+          .usersCollection
+          .where(
+            'role',
+            isEqualTo: adminR,
+          )
+          .get()
+          .then(
+        (qShot) {
+          final list = qShot.docs;
+          for (var e in list) {
+            final data = e.data() as Map<String, dynamic>;
+            if (data["tokens"] != null) {
+              adminsTokenList.add(data["tokens"]);
+            }
+          }
+        },
+      );
+      await NotificationServices.sendNotification(
+        "You have a new book request",
+        "${requestedBy.name} has requested for ${book.title}",
+        adminsTokenList,
+      );
+    });
 
     checkButtons();
   }
@@ -71,15 +97,33 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   }
 
   approveRequest() async {
+    var reqBy = Reader(uid: book.requestedBy!.uid, name: book.requestedBy!.uid);
     await DataRepository().booksCollection.doc(book.uid).update({
       'issued_to': book.requestedBy?.toMap(),
       'requested_by': null,
+    }).then((_) async {
+      String userToken = await DataRepository().getUserOSToken(reqBy.uid!);
+
+      await NotificationServices.sendNotification(
+        "Your book request got approved",
+        "You have now ${book.title}",
+        [userToken],
+      );
     });
   }
 
   declineRequest() async {
+    var uid = book.requestedBy!.uid;
     await DataRepository().booksCollection.doc(book.uid).update({
       'requested_by': null,
+    }).then((_) async {
+      final userToken = await DataRepository().getUserOSToken(uid!);
+
+      await NotificationServices.sendNotification(
+        "Your book request got declined by ${UserPreferences.getUserFName()}",
+        "You can request again for ${book.title}",
+        [userToken],
+      );
     });
   }
 

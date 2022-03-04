@@ -40,7 +40,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       autofocus: false,
       controller: firstNameController,
       keyboardType: TextInputType.name,
-      //validator: () {},
       onSaved: (value) {
         firstNameController.text = value!;
       },
@@ -70,13 +69,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       autofocus: false,
       controller: lastNameController,
       keyboardType: TextInputType.name,
-      //validator: () {},
       onSaved: (value) {
         lastNameController.text = value!;
       },
       validator: (value) {
         if (value!.isEmpty) {
-          return "First name cannot be empty";
+          return "Last name cannot be empty";
         }
         return null;
       },
@@ -95,7 +93,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       autofocus: false,
       controller: emailController,
       keyboardType: TextInputType.emailAddress,
-      //validator: () {},
       onSaved: (value) {
         emailController.text = value!;
       },
@@ -114,7 +111,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       controller: passwordController,
       autofocus: false,
       obscureText: true,
-      //validator: () {},
       onSaved: (value) {
         passwordController.text = value!;
       },
@@ -127,6 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (!regex.hasMatch(value)) {
           return "Enter valid name(Min. 3 characters)";
         }
+        return null;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(

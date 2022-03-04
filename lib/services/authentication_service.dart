@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../utils/user_preferences.dart';
@@ -43,6 +44,15 @@ class AuthenticationService {
     } on FirebaseAuthException catch (e) {
       return "${e.message}";
     }
+  }
+
+  Future<void> saveTokenToDatabase(String token) async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .update({'tokens': token});
   }
 
   User? getUser() {

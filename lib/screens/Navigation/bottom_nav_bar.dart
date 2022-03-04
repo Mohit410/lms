@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lms/screens/Dashboard/dashboard_screen.dart';
 import 'package:lms/screens/Home/home_screen.dart';
-import 'package:lms/screens/Notification/notification_screen.dart';
 import 'package:lms/screens/Profile/profile_screen.dart';
+import 'package:lms/services/authentication_service.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../../utils/constants.dart';
 
 class BottomNavPanel extends StatefulWidget {
   const BottomNavPanel({Key? key}) : super(key: key);
@@ -14,15 +19,32 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
   int currentIndex = 0;
   final _widgteOptions = <Widget>[
     const HomeScreen(),
-    const NotificationScreen(),
+    const DashboardScreen(),
     const ProfileScreen()
   ];
 
   final _appBarWidget = <Widget>[
     const Text("Home"),
-    const Text("Notification"),
+    const Text("Dashboard"),
     const Text("Profile")
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    initPlateformState();
+  }
+
+  initPlateformState() async {
+    await OneSignal.shared.setAppId(appId);
+
+    var deviceState = await OneSignal.shared.getDeviceState();
+
+    if (deviceState != null && deviceState.userId != null) {
+      var tokenId = deviceState.userId;
+      await context.read<AuthenticationService>().saveTokenToDatabase(tokenId!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +57,7 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
+          elevation: 0,
         ),
         bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
@@ -46,15 +69,15 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
             onTap: (index) => setState(() => currentIndex = index),
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: Icon(Icons.home_rounded),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.notifications),
-                label: 'Notification',
+                icon: Icon(Icons.dashboard_rounded),
+                label: 'Dashboard',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.person_rounded),
                 label: 'Profile',
               )
             ]),

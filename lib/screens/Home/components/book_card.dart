@@ -28,28 +28,31 @@ class _BookCardState extends State<BookCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 10,
-            ),
             Text("Title: ${widget._book.title}",
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(
-              height: 10,
+              height: 8,
             ),
-            Text("Category: ${widget._book.category?.title}"),
+            Text("Category: ${widget._book.category?.title}",
+                style: const TextStyle(
+                    fontWeight: FontWeight.normal, fontSize: 14)),
             const SizedBox(
-              height: 10,
+              height: 8,
             ),
-            Row(
+            Wrap(
               children: [
                 const Text("Authors: "),
-                Text(getAuthorsString(widget._book.authors!)),
+                Text(getAuthorsString(widget._book.authors!),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.normal, fontSize: 14)),
               ],
             )
           ],

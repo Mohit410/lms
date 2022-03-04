@@ -28,3 +28,6 @@ const userUidKey = 'uid';
 //role
 const adminR = "admin";
 const userR = "user";
+
+//one signal id
+const appId = "ce001597-0449-43d4-9fe5-e1afda694702";

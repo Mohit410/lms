@@ -4,7 +4,6 @@ import 'package:lms/screens/Profile/edit_form.dart';
 import 'package:lms/screens/Profile/user_details.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:provider/provider.dart';
-
 import '../../utils/constants.dart';
 
 class ProfileScreen extends StatefulWidget {

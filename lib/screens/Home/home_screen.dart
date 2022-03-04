@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lms/main.dart';
 import 'package:lms/screens/Home/books_search_screen.dart';
 import 'package:lms/screens/Home/category_screen.dart';
-
 import '../../utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
