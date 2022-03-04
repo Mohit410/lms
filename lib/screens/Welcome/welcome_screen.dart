@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/screens/Login/login_page.dart';
-import 'package:lms/screens/SignUp/signup_page.dart';
+import 'package:lms/utils/constants.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -25,18 +24,12 @@ class WelcomeScreen extends StatelessWidget {
               SizedBox(height: size.height * 0.05),
               ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const LoginScreen();
-                    }));
+                    Navigator.pushNamed(context, loginRoute);
                   },
                   child: const Text(" LOGIN ")),
               OutlinedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const SignUpScreen();
-                    }));
+                    Navigator.pushNamed(context, signUpRoute);
                   },
                   child: const Text("SIGN UP"))
             ]),
