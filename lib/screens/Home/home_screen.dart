@@ -4,14 +4,9 @@ import 'package:lms/screens/Home/books_search_screen.dart';
 import 'package:lms/screens/Home/category_screen.dart';
 import '../../utils/constants.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

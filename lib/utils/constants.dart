@@ -31,3 +31,7 @@ const userR = "user";
 
 //one signal id
 const appId = "ce001597-0449-43d4-9fe5-e1afda694702";
+
+//btn colors
+const blueButtonColor = Color(0xFF1564C0);
+const redButtonColor = Color(0xFFFF5252);

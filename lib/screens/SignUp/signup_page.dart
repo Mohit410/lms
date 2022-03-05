@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/services/authentication_service.dart';
+import 'package:lms/utils/helper.dart';
 // ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
@@ -96,6 +97,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       onSaved: (value) {
         emailController.text = value!;
       },
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Please enter your email";
+        }
+        if (!RegExp("^[a-zA-Z0-9.!#%&'*+/=?^_`{|}~-]+@lms.in")
+            .hasMatch(value)) {
+          return "Please enter a valid email";
+        }
+        return null;
+      },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.mail),
@@ -110,18 +121,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final passwordField = TextFormField(
       controller: passwordController,
       autofocus: false,
+      keyboardType: TextInputType.visiblePassword,
       obscureText: true,
       onSaved: (value) {
         passwordController.text = value!;
       },
       validator: (value) {
-        RegExp regex = RegExp(r"^.{3,}$");
         if (value!.isEmpty) {
-          return "First name cannot be empty";
+          return "Password required";
         }
-
+        RegExp regex = RegExp(r"^.{6,}$");
         if (!regex.hasMatch(value)) {
-          return "Enter valid name(Min. 3 characters)";
+          return "Enter valid password(Min. 6 characters)";
         }
         return null;
       },
@@ -141,8 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       autofocus: false,
       obscureText: true,
       validator: (value) {
-        if (confirmPasswordController.text.length > 6 &&
-            passwordController.text != value) {
+        if (value!.length < 6 && passwordController.text != value) {
           return "Password don't match";
         }
         return null;
@@ -159,32 +169,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(10),
           )),
     );
-
-    //SignUp Button
-    final signupButton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          setState(() {
-            _isLoading = true;
-          });
-          signUp(emailController.text, passwordController.text);
-        },
-        child: const Text(
-          "SIGN UP",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    Widget sizedBoxMargin(double value) {
-      return SizedBox(height: value);
-    }
 
     return (_isLoading)
         ? const Center(
@@ -230,7 +214,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         sizedBoxMargin(20),
                         confirmPasswordField,
                         sizedBoxMargin(35),
-                        signupButton,
+                        customButton(() {
+                          signUp(emailController.text, passwordController.text);
+                        }, "SIGN UP", context, redButtonColor),
                         sizedBoxMargin(15),
                       ],
                     ),
@@ -241,10 +227,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
   }
 
-  Future signUp(String email, String password) async {
+  signUp(String email, String password) async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       User? user;
-      context
+      await context
           .read<AuthenticationService>()
           .signUp(
             email: email,
@@ -260,17 +249,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               context, homeRoute, (route) => false);
         }
         showSnackbar(value, context);
-        setState(() {
-          _isLoading = false;
-        });
       });
-      // await _auth
-      //     .createUserWithEmailAndPassword(email: email, password: password)
-      //     .then((value) => postUserDetailsToFirestore())
-      //     .catchError((e) {
-      //   ScaffoldMessenger.of(context)
-      //       .showSnackBar(SnackBar(content: Text(e!.message)));
-      // });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -290,8 +272,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         .doc(user.uid)
         .set(userModel.toMap());
 
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Account created successfully")));
-    Navigator.pushNamedAndRemoveUntil(context, homeRoute, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, bottomNavPanelRoute, (route) => false);
   }
 }

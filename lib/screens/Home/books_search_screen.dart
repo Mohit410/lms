@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
-
 import '../../model/book_model.dart';
 import '../../utils/constants.dart';
 import 'components/book_card.dart';
