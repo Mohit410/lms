@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/user_model.dart';
+import 'package:lms/utils/constants.dart';
+import 'package:lms/utils/helper.dart';
 
 class UserDetail extends StatefulWidget {
   final VoidCallback onEditClicked;
@@ -48,68 +50,6 @@ class _UserDetailState extends State<UserDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final editButton = Material(
-      elevation: 5,
-      color: Colors.blue.shade800,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          widget.onEditClicked();
-        },
-        child: const Text(
-          "EDIT",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    final signOutButton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          setState(() {
-            _isLoading = false;
-          });
-          widget.onSignOutClicked();
-          setState(() {
-            _isLoading = true;
-          });
-        },
-        child: const Text(
-          "SIGN OUT",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    headingText(String value) => Text(
-          value,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade400,
-          ),
-          textAlign: TextAlign.start,
-        );
-
-    fieldText(String value) => Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey.shade200,
-          ),
-          textAlign: TextAlign.start,
-        );
-
     Widget sizedBoxMargin(double value) {
       return SizedBox(height: value);
     }
@@ -132,9 +72,11 @@ class _UserDetailState extends State<UserDetail> {
               sizedBoxMargin(5),
               fieldText(userModel.email ?? " "),
               sizedBoxMargin(30),
-              editButton,
+              customButton(
+                  widget.onEditClicked, "EDIT", context, blueButtonColor),
               sizedBoxMargin(20),
-              signOutButton,
+              customButton(
+                  widget.onSignOutClicked, "SIGN OUT", context, redButtonColor),
               sizedBoxMargin(40),
             ],
           );

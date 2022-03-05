@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lms/main.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/services/authentication_service.dart';
+import 'package:lms/utils/helper.dart';
 import 'package:lms/utils/user_preferences.dart';
 // ignore: implementation_imports
 import 'package:provider/src/provider.dart';
@@ -32,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
       autofocus: false,
       keyboardType: TextInputType.emailAddress,
       controller: emailController,
-      //validator: () {},
       onSaved: (value) {
         emailController.text = value!;
       },
@@ -61,7 +61,6 @@ class _LoginScreenState extends State<LoginScreen> {
       autofocus: false,
       obscureText: true,
       controller: passwordController,
-      //validator: () {},
       onSaved: (value) {
         passwordController.text = value!;
       },
@@ -84,29 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(10),
           )),
     );
-
-    //Login Button
-    final loginButton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          logIn(emailController.text, passwordController.text);
-        },
-        child: const Text(
-          "Login",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    Widget sizedBoxMargin(double value) {
-      return SizedBox(height: value);
-    }
 
     return (_isLoading)
         ? const Center(
@@ -146,7 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         sizedBoxMargin(20),
                         passwordField,
                         sizedBoxMargin(35),
-                        loginButton,
+                        customButton(() {
+                          logIn(emailController.text, passwordController.text);
+                        }, "Login", context, redButtonColor),
                         sizedBoxMargin(15),
                       ],
                     )),
@@ -155,13 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
           );
   }
 
-  void logIn(String email, String password) {
+  logIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       User? user;
-      context
+      await context
           .read<AuthenticationService>()
           .signIn(
             email: email.trim(),

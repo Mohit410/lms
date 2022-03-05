@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/model/book_model.dart';
 
-class BookCard extends StatefulWidget {
+class BookCard extends StatelessWidget {
   final Book _book;
 
   const BookCard(
@@ -9,12 +9,6 @@ class BookCard extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  @override
-  State<BookCard> createState() => _BookCardState();
-}
-
-class _BookCardState extends State<BookCard> {
-  //
   String getAuthorsString(List<String> authors) {
     var authorsString = "";
     for (var author in authors) {
@@ -35,13 +29,13 @@ class _BookCardState extends State<BookCard> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Title: ${widget._book.title}",
+            Text("Title: ${_book.title}",
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(
               height: 8,
             ),
-            Text("Category: ${widget._book.category?.title}",
+            Text("Category: ${_book.category?.title}",
                 style: const TextStyle(
                     fontWeight: FontWeight.normal, fontSize: 14)),
             const SizedBox(
@@ -50,7 +44,7 @@ class _BookCardState extends State<BookCard> {
             Wrap(
               children: [
                 const Text("Authors: "),
-                Text(getAuthorsString(widget._book.authors!),
+                Text(getAuthorsString(_book.authors!),
                     style: const TextStyle(
                         fontWeight: FontWeight.normal, fontSize: 14)),
               ],

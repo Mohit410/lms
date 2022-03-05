@@ -8,33 +8,13 @@ import '../../utils/constants.dart';
 import '../Home/components/book_card.dart';
 import 'components/request_card.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
-
-  @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController tabController;
+class DashboardScreen extends StatelessWidget {
+  DashboardScreen({Key? key}) : super(key: key);
 
   final tabs = [
-    const Tab(text: 'Sent Requests', icon: Icon(Icons.inventory_rounded)),
-    const Tab(text: 'Inventory', icon: Icon(Icons.send_rounded)),
+    const Tab(text: 'Sent Requests', icon: Icon(Icons.send_rounded)),
+    const Tab(text: 'Inventory', icon: Icon(Icons.inventory_2_rounded)),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: tabs.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    tabController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,14 +73,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                   elevation: 0,
                   backgroundColor: Colors.blue,
                   bottom: TabBar(
-                    controller: tabController,
                     tabs: tabs,
                   ),
                 ),
           body: (admin)
               ? sentRequestTab(false)
               : TabBarView(
-                  controller: tabController,
                   children: [sentRequestTab(false), sentRequestTab(true)],
                 ),
         ));

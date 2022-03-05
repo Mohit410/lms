@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/utils/constants.dart';
+import 'package:lms/utils/helper.dart';
 
 class EditForm extends StatefulWidget {
   UserModel userModel = UserModel();
@@ -36,9 +37,8 @@ class _EditFormState extends State<EditForm> {
 
   @override
   Widget build(BuildContext context) {
-    Future updateUserData() {
-      setState(() {});
-      return FirebaseFirestore.instance
+    updateUserData() async {
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userModel.uid)
           .update(
@@ -47,7 +47,6 @@ class _EditFormState extends State<EditForm> {
           'last_name': lastNameController.text
         },
       ).then((value) {
-        setState(() {});
         showSnackbar("User details updated successfully", context);
         widget.onSaveClicked();
       }).catchError((error) {
@@ -59,7 +58,6 @@ class _EditFormState extends State<EditForm> {
       autofocus: false,
       controller: firstNameController,
       keyboardType: TextInputType.name,
-      //validator: () {},
       onSaved: (value) {
         firstNameController.text = value!;
       },
@@ -88,7 +86,6 @@ class _EditFormState extends State<EditForm> {
       autofocus: false,
       controller: lastNameController,
       keyboardType: TextInputType.name,
-      //validator: () {},
       onSaved: (value) {
         lastNameController.text = value!;
       },
@@ -159,9 +156,10 @@ class _EditFormState extends State<EditForm> {
           sizedBoxMargin(20),
           lastNameField,
           sizedBoxMargin(30),
-          cancelButton,
+          customButton(
+              widget.onCancelClicked, "CANCEL", context, redButtonColor),
           sizedBoxMargin(20),
-          saveButton,
+          customButton(updateUserData, "SAVE", context, blueButtonColor),
           sizedBoxMargin(40),
         ],
       ),

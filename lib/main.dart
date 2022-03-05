@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           bottomNavPanelRoute: (_) => const BottomNavPanel(),
           homeRoute: (_) => const HomeScreen(),
           profileRoute: (_) => const ProfileScreen(),
-          notificationRoute: (_) => const DashboardScreen(),
+          notificationRoute: (_) => DashboardScreen(),
           addBookRoute: (_) => const AddBookScreen(),
           bookDetailRoute: (_) => const BookDetailScreen(),
           booksListRoute: (_) => const BooksSearchScreen(),

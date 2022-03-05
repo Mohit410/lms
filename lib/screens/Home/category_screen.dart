@@ -99,18 +99,14 @@ class _CategoryCardState extends State<CategoryCard> {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                widget.category.title!,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
+          child: Center(
+            child: Text(
+              widget.category.title!,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
               ),
-            ],
+            ),
           ),
         ),
       ),

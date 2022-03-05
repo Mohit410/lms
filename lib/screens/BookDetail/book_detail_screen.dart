@@ -8,7 +8,9 @@ import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
 import 'package:lms/services/notification_services.dart';
 import 'package:lms/utils/constants.dart';
+import 'package:lms/utils/helper.dart';
 import 'package:lms/utils/user_preferences.dart';
+import 'package:provider/provider.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({
@@ -141,142 +143,41 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   Widget build(BuildContext context) {
     final _bookUid = ModalRoute.of(context)!.settings.arguments as String;
 
-    final requestButton = Material(
-      elevation: 5,
-      color: Colors.blue.shade800,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          requestBook();
-        },
-        child: const Text(
-          "REQUEST BOOK",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    Widget sizedBoxMargin10() {
+      return const SizedBox(height: 10);
+    }
 
-    final cancelRequestButton = Material(
-      elevation: 5,
-      color: Colors.redAccent.shade400,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          cancelRequest();
-        },
-        child: const Text(
-          "CANCEL REQUEST",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    final depositebutton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          depositeBook();
-        },
-        child: const Text(
-          "DEPOSITE",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    final approvebutton = Material(
-      elevation: 5,
-      color: Colors.blue,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          approveRequest();
-        },
-        child: const Text(
-          "APPROVE REQUEST",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    final declinebutton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          declineRequest();
-        },
-        child: const Text(
-          "DECLINE REQUEST",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    headingText(String value) => Text(
-          value,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade400,
-          ),
-          textAlign: TextAlign.start,
-        );
-
-    fieldText(String value) => Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey.shade200,
-          ),
-          textAlign: TextAlign.start,
-        );
-
-    Widget sizedBoxMargin(double value) {
-      return SizedBox(height: value);
+    Widget sizedBoxMargin20() {
+      return const SizedBox(height: 20);
     }
 
     List<Widget> getBtnList() {
       List<Widget> btnList = [];
       checkButtons();
       if (_showRequestBtn) {
-        btnList.add(requestButton);
-        btnList.add(sizedBoxMargin(20));
+        btnList.add(customButton(
+            requestBook, "REQUEST BOOK", context, blueButtonColor));
+        btnList.add(sizedBoxMargin20());
       }
       if (_showCancelRequestBtn) {
-        btnList.add(cancelRequestButton);
-        btnList.add(sizedBoxMargin(20));
+        btnList.add(customButton(
+            cancelRequest, "CANCEL REQUEST", context, redButtonColor));
+        btnList.add(sizedBoxMargin20());
       }
       if (_showDepositeBtn) {
-        btnList.add(depositebutton);
-        btnList.add(sizedBoxMargin(20));
+        btnList.add(
+            customButton(depositeBook, "DEPOSITE", context, redButtonColor));
+        btnList.add(sizedBoxMargin20());
       }
       if (_showApproveBtn) {
-        btnList.add(approvebutton);
-        btnList.add(sizedBoxMargin(20));
+        btnList.add(customButton(
+            approveRequest, "APPROVE REQUEST", context, blueButtonColor));
+        btnList.add(sizedBoxMargin20());
       }
       if (_showDeclineBtn) {
-        btnList.add(declinebutton);
-        btnList.add(sizedBoxMargin(20));
+        btnList.add(customButton(
+            declineRequest, "DECLINE REQUEST", context, redButtonColor));
+        btnList.add(sizedBoxMargin20());
       }
 
       return btnList;
@@ -292,29 +193,29 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           : " ";
       List<Widget> list = <Widget>[
         headingText("Title"),
-        sizedBoxMargin(10),
+        sizedBoxMargin10(),
         fieldText(book.title ?? " "),
-        sizedBoxMargin(20),
+        sizedBoxMargin20(),
         headingText("Auhtors"),
-        sizedBoxMargin(10),
+        sizedBoxMargin10(),
         fieldText(authors),
-        sizedBoxMargin(20),
+        sizedBoxMargin20(),
         headingText("Category"),
-        sizedBoxMargin(10),
+        sizedBoxMargin10(),
         fieldText(book.category?.title ?? " "),
-        sizedBoxMargin(20),
+        sizedBoxMargin20(),
         headingText("Availability"),
-        sizedBoxMargin(10),
+        sizedBoxMargin10(),
         fieldText((book.issuedTo == null) ? "Available" : "Not Available"),
-        sizedBoxMargin(20),
+        sizedBoxMargin20(),
         (book.issuedTo != null)
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   headingText("Issued To"),
-                  sizedBoxMargin(10),
+                  sizedBoxMargin10(),
                   fieldText(book.issuedTo?.name ?? ""),
-                  sizedBoxMargin(20),
+                  sizedBoxMargin20(),
                 ],
               )
             : Container(),
@@ -323,13 +224,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   headingText("Requested By"),
-                  sizedBoxMargin(10),
+                  sizedBoxMargin10(),
                   fieldText(book.requestedBy?.name ?? ""),
-                  sizedBoxMargin(20),
+                  sizedBoxMargin20(),
                 ],
               )
             : Container(),
-        sizedBoxMargin(40),
+        const SizedBox(height: 40),
       ];
 
       list.addAll(getBtnList());
