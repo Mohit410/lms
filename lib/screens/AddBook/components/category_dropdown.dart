@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/utils/constants.dart';
 
 class CategoryDropDown extends StatefulWidget {
   Category? _category;
@@ -29,8 +30,7 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
       });
     });
     setState(() {
-      category = categoryList.firstWhere(
-          (element) => element.toString() == widget._category.toString());
+      category = widget._category;
       if (category != null) widget.onCategoryChanged(category!);
     });
   }
@@ -52,7 +52,11 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
         child: DropdownButton<Category>(
-          hint: const Text("Select Category"),
+          hint: const Text(
+            "Select Category",
+            style: TextStyle(color: blueButtonColor),
+          ),
+          isExpanded: true,
           onChanged: (value) {
             setState(() {
               if (value != null) {

@@ -105,43 +105,6 @@ class _EditFormState extends State<EditForm> {
           )),
     );
 
-    //Save Button
-    final saveButton = Material(
-      elevation: 5,
-      color: Colors.blue.shade800,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          updateUserData();
-        },
-        child: const Text(
-          "SAVE",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    final cancelButton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          widget.onCancelClicked();
-        },
-        child: const Text(
-          "CANCEL",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
     Widget sizedBoxMargin(double value) {
       return SizedBox(height: value);
     }

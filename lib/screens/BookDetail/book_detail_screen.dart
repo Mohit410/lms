@@ -10,7 +10,6 @@ import 'package:lms/services/notification_services.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/helper.dart';
 import 'package:lms/utils/user_preferences.dart';
-import 'package:provider/provider.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({
@@ -208,6 +207,11 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         sizedBoxMargin10(),
         fieldText((book.issuedTo == null) ? "Available" : "Not Available"),
         sizedBoxMargin20(),
+        headingText("Location"),
+        sizedBoxMargin10(),
+        fieldText(
+            "Rack - ${book.bookLocation!.rackNo}, Row - ${book.bookLocation!.rowNo}, Position - ${book.bookLocation!.position}, Dir - ${book.bookLocation!.direction}"),
+        sizedBoxMargin20(),
         (book.issuedTo != null)
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,6 +219,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   headingText("Issued To"),
                   sizedBoxMargin10(),
                   fieldText(book.issuedTo?.name ?? ""),
+                  sizedBoxMargin20(),
+                  headingText("Will be returned on: "),
+                  sizedBoxMargin10(),
+                  fieldText(book.issuedTo?.returnDate ?? ""),
                   sizedBoxMargin20(),
                 ],
               )
@@ -241,6 +249,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Book Details"),
+        backgroundColor: Colors.blue,
       ),
       floatingActionButton: (admin)
           ? FloatingActionButton.extended(

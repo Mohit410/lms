@@ -1,6 +1,8 @@
 import 'package:lms/model/category_model.dart';
 import 'package:lms/model/reader_model.dart';
 
+import 'book_location.dart';
+
 class Book {
   String? uid;
   String? title;
@@ -9,9 +11,7 @@ class Book {
   Category? category;
   Reader? issuedTo;
   Reader? requestedBy;
-
-  //UserModel issuedTo;
-  String? status;
+  BookLocation? bookLocation;
 
   Book({
     this.uid,
@@ -19,9 +19,9 @@ class Book {
     this.authors,
     this.tags,
     this.category,
-    this.status,
     this.issuedTo,
     this.requestedBy,
+    this.bookLocation,
   });
 
   factory Book.fromMap(map) {
@@ -31,12 +31,14 @@ class Book {
       requestedBy: (map['requested_by'] != null)
           ? Reader.fromMap(map['requested_by'])
           : null,
+      bookLocation: (map['location'] != null)
+          ? BookLocation.fromMap(map['location'])
+          : null,
       tags: List.from(map['tags']),
       uid: map['uid'],
       title: map['title'],
       authors: List.from(map['authors']),
       category: Category.fromMap(map['category']),
-      status: map['status'],
     );
   }
 
@@ -46,8 +48,8 @@ class Book {
         'authors': authors,
         'tags': tags,
         'category': category?.toMap(),
-        'status': status,
         'issued_to': issuedTo?.toMap(),
         'requested_by': requestedBy?.toMap(),
+        'location': bookLocation?.toMap()
       };
 }

@@ -73,10 +73,18 @@ class _UserDetailState extends State<UserDetail> {
               fieldText(userModel.email ?? " "),
               sizedBoxMargin(30),
               customButton(
-                  widget.onEditClicked, "EDIT", context, blueButtonColor),
+                  widget.onEditClicked, "EDIT", context, blueButtonColor,
+                  icon: const Icon(
+                    Icons.edit_rounded,
+                  )),
               sizedBoxMargin(20),
               customButton(
-                  widget.onSignOutClicked, "SIGN OUT", context, redButtonColor),
+                widget.onSignOutClicked,
+                "SIGN OUT",
+                context,
+                redButtonColor,
+                icon: const Icon(Icons.logout_rounded),
+              ),
               sizedBoxMargin(40),
             ],
           );

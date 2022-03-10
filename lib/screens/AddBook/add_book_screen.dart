@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lms/model/book_location.dart';
 import 'package:lms/model/book_model.dart';
 import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
 import 'package:lms/utils/constants.dart';
-import 'package:textfield_tags/textfield_tags.dart';
+import 'package:lms/utils/helper.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({Key? key}) : super(key: key);
@@ -21,8 +23,31 @@ class _AddBookScreenState extends State<AddBookScreen> {
     setState(() {
       _category = book?.category;
     });
-
     getCategoryList();
+    tagsFocusNode = FocusNode();
+    authorsFocusNode = FocusNode();
+  }
+
+  @override
+  void didChangeDependencies() {
+    book = ModalRoute.of(context)?.settings.arguments as Book?;
+    if (book != null) {
+      bookTitleController.text = book!.title!;
+      rackController.text = book!.bookLocation!.rackNo!;
+      rowController.text = book!.bookLocation!.rowNo!;
+      positionController.text = book!.bookLocation!.position!;
+      _direction = book!.bookLocation!.direction!;
+      _tagList = book!.tags!;
+      _authorsList = book!.authors!;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    tagsFocusNode.dispose();
+    authorsFocusNode.dispose();
+    super.dispose();
   }
 
   getCategoryList() async {
@@ -35,8 +60,8 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   var _isLoading = false;
 
-  final List<String> _tagList = [];
-  final List<String> _authorsList = [];
+  List<String> _tagList = [];
+  List<String> _authorsList = [];
   List<Category> _categoryList = [];
   Category? _category;
 
@@ -51,18 +76,22 @@ class _AddBookScreenState extends State<AddBookScreen> {
   }
 
   final bookTitleController = TextEditingController(text: "");
+  final authorController = TextEditingController();
+  final tagsController = TextEditingController();
+  final rackController = TextEditingController();
+  final rowController = TextEditingController();
+  final positionController = TextEditingController();
+
+  String _direction = "";
+  final List<String> _directionsList = ["L2R", "R2L"];
+
+  late FocusNode tagsFocusNode;
+  late FocusNode authorsFocusNode;
+
+  int setBookCount = 0;
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      book = ModalRoute.of(context)?.settings.arguments as Book?;
-      if (book != null) {
-        bookTitleController.text = book!.title!;
-        _tagList.addAll(book!.tags!);
-        _authorsList.addAll(book!.authors!);
-      }
-    });
-
     final titleField = TextFormField(
       controller: bookTitleController,
       textInputAction: TextInputAction.next,
@@ -89,46 +118,207 @@ class _AddBookScreenState extends State<AddBookScreen> {
       ),
     );
 
-    final authorTagField = TextFieldTags(
-      initialTags: book?.authors ?? _authorsList,
-      textSeparators: const [","],
-      tagsStyler: TagsStyler(
-        tagTextStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
-          color: Colors.white,
-        ),
-        tagCancelIcon: const Icon(
-          Icons.cancel,
-          color: Colors.black,
-        ),
-        tagDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.red.shade400,
-        ),
-      ),
-      textFieldStyler: TextFieldStyler(
-        hintText: "Enter Author Names",
-        helperText: "Enter , to seperate Authors",
-        textFieldBorder: OutlineInputBorder(
+    final rackField = TextFormField(
+      controller: rackController,
+      textInputAction: TextInputAction.next,
+      autofocus: false,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      textAlign: TextAlign.center,
+      keyboardType: TextInputType.number,
+      onSaved: (value) {
+        rackController.text = value!;
+      },
+      validator: (value) {
+        if (value!.isEmpty) return "Rack No. cannot be empty";
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelAlignment: FloatingLabelAlignment.center,
+        alignLabelWithHint: true,
+        contentPadding: EdgeInsets.zero,
+        label: const Text("Rack No"),
+        hintText: "eg. 8",
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onTag: (tag) {
-        setState(() {
-          _authorsList.add(tag);
-        });
+    );
+
+    final rowField = TextFormField(
+      controller: rowController,
+      textInputAction: TextInputAction.next,
+      autofocus: false,
+      textAlign: TextAlign.center,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      onSaved: (value) {
+        rowController.text = value!;
       },
-      onDelete: (tag) {
-        setState(() {
-          _authorsList.remove(tag);
-        });
-      },
-      validator: (tag) {
-        if (tag.isEmpty) return "Auhtor name cannot be empty";
-        if (tag.length < 3) {
-          return "Min 3 character required";
-        }
+      validator: (value) {
+        if (value!.isEmpty) return "Row cannot be empty";
         return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelAlignment: FloatingLabelAlignment.center,
+        alignLabelWithHint: true,
+        contentPadding: EdgeInsets.zero,
+        label: const Text("Row No."),
+        hintText: "eg. 3",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+
+    final positionField = TextFormField(
+      controller: positionController,
+      textInputAction: TextInputAction.next,
+      autofocus: false,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      keyboardType: TextInputType.number,
+      textAlign: TextAlign.center,
+      onSaved: (value) {
+        positionController.text = value!;
+      },
+      validator: (value) {
+        if (value!.isEmpty) return "Position cannot be empty";
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelAlignment: FloatingLabelAlignment.center,
+        alignLabelWithHint: true,
+        contentPadding: EdgeInsets.zero,
+        label: const Text("Position"),
+        hintText: "eg. 12",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+
+    getTagInputChip(String value) => InputChip(
+          label: Text(value),
+          labelStyle: const TextStyle(fontSize: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          deleteIcon: const Icon(Icons.cancel),
+          onDeleted: () {
+            setState(() {
+              _tagList.remove(value);
+            });
+          },
+        );
+
+    final tagListContainer = Align(
+        alignment: Alignment.centerLeft,
+        child: Wrap(
+          spacing: 4.0,
+          runSpacing: 4.0,
+          children: _tagList.map((e) => getTagInputChip(e)).toList(),
+        ));
+
+    final tagsTextField = TextFormField(
+      keyboardType: TextInputType.name,
+      focusNode: tagsFocusNode,
+      controller: tagsController,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (value) {
+        setState(() {
+          if (value.isNotEmpty) {
+            _tagList.add(value);
+          }
+        });
+        tagsController.text = "";
+        tagsFocusNode.requestFocus();
+      },
+      validator: (_) {
+        if (_tagList.isEmpty) return "Tags cannot be empty";
+        return null;
+      },
+      decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.tag_rounded),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          helperText:
+              (tagsFocusNode.hasFocus) ? "Press Enter to Add Tag" : null,
+          labelText: 'Tags',
+          hintText: "eg. Java, android",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          )),
+    );
+
+    getAuthorInputChip(String value) => InputChip(
+          label: Text(value),
+          labelStyle: const TextStyle(fontSize: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          deleteIcon: const Icon(Icons.cancel),
+          onDeleted: () {
+            setState(() {
+              _authorsList.remove(value);
+            });
+          },
+        );
+
+    final authorListContainer = Align(
+        alignment: Alignment.centerLeft,
+        child: Wrap(
+          spacing: 4.0,
+          runSpacing: 4.0,
+          children: _authorsList.map((e) => getAuthorInputChip(e)).toList(),
+        ));
+
+    final authorTextField = TextFormField(
+      keyboardType: TextInputType.name,
+      focusNode: authorsFocusNode,
+      controller: authorController,
+      onFieldSubmitted: (value) {
+        setState(() {
+          if (value.isNotEmpty) {
+            _authorsList.add(value);
+          }
+        });
+        authorController.text = "";
+        authorsFocusNode.requestFocus();
+      },
+      validator: (_) {
+        if (_authorsList.isEmpty) return "Author cannot be empty";
+        return null;
+      },
+      decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.person_rounded),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: 'eg. Andrew Ng',
+          helperText:
+              (authorsFocusNode.hasFocus) ? "Press Enter to Add Author" : null,
+          labelText: "Authors",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          )),
+    );
+
+    final directionToggleButtons = ToggleButtons(
+      children: const [
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            child: Text(
+              "Left to Right",
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+            )),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            child: Text(
+              "Right to Left",
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+            )),
+      ],
+      isSelected: _directionsList.map((e) => e == _direction).toList(),
+      onPressed: (index) {
+        setState(() {
+          _direction = _directionsList[index];
+        });
       },
     );
 
@@ -163,42 +353,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
               },
             )));
 
-    final tagsField = TextFieldTags(
-      initialTags: book?.tags ?? _tagList,
-      textSeparators: const [","],
-      tagsStyler: TagsStyler(
-        tagTextStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
-          color: Colors.white,
-        ),
-        tagCancelIcon: const Icon(
-          Icons.cancel,
-          color: Colors.black,
-        ),
-        tagDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.red.shade400,
-        ),
-      ),
-      textFieldStyler: TextFieldStyler(
-        hintText: "Enter Associated Tags",
-        helperText: "Enter , to separate tags",
-        textFieldBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      onTag: (tag) {
-        setState(() {
-          _tagList.add(tag);
-        });
-      },
-      onDelete: (tag) {
-        setState(() {
-          _tagList.remove(tag);
-        });
-      },
-    );
-
     addBookToCollection() async {
       if (_formKey.currentState!.validate()) {
         setState(() {
@@ -210,7 +364,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
           authors: _authorsList.toSet().toList(),
           tags: _tagList.toSet().toList(),
           category: _category!,
-          status: "in",
+          bookLocation: BookLocation(
+              rackNo: rackController.text,
+              rowNo: rowController.text,
+              position: positionController.text,
+              direction: _direction),
         );
 
         final result = (book == null)
@@ -238,36 +396,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
       }
     }
 
-    final submitButton = Material(
-      elevation: 5,
-      color: Colors.redAccent,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        padding: const EdgeInsets.symmetric(
-          vertical: 15,
-          horizontal: 20,
-        ),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: (() {
-          addBookToCollection();
-        }),
-        child: const Text(
-          "Submit",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-
-    Widget sizedBoxMargin(double value) {
-      return SizedBox(height: value);
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add New Book"),
+        title: Text((book == null) ? "Add New Book" : "Edit Book"),
       ),
       body: Center(
         child: (_isLoading)
@@ -284,11 +415,40 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         sizedBoxMargin(20),
                         categoryDropdownBtn,
                         sizedBoxMargin(20),
-                        authorTagField,
+                        authorListContainer,
+                        sizedBoxMargin(8),
+                        authorTextField,
                         sizedBoxMargin(20),
-                        tagsField,
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: const Text("Location"),
+                        ),
+                        sizedBoxMargin(10),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(child: rackField),
+                              const SizedBox(width: 10),
+                              Expanded(child: rowField),
+                              const SizedBox(width: 10),
+                              Expanded(child: positionField)
+                            ]),
+                        sizedBoxMargin(20),
+                        Row(
+                          children: [
+                            const Expanded(
+                                child: Text("Direction",
+                                    style: TextStyle(fontSize: 16))),
+                            directionToggleButtons
+                          ],
+                        ),
+                        sizedBoxMargin(20),
+                        tagListContainer,
+                        sizedBoxMargin(8),
+                        tagsTextField,
                         sizedBoxMargin(40),
-                        submitButton
+                        customButton(addBookToCollection, "Submit", context,
+                            redButtonColor),
                       ],
                     ),
                   ),

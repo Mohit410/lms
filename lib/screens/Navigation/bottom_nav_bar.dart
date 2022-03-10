@@ -22,12 +22,6 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
     const ProfileScreen()
   ];
 
-  final _appBarWidget = <Widget>[
-    const Text("Home"),
-    const Text("Dashboard"),
-    const Text("Profile")
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -49,6 +43,16 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                "Library Management System",
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.blue,
+              elevation: 0,
+              centerTitle: true,
+            ),
             bottomNavigationBar: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.blue,
