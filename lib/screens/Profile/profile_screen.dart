@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/screens/Profile/edit_form.dart';
 import 'package:lms/screens/Profile/user_details.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:provider/provider.dart';
+import '../../repository/data_repository.dart';
 import '../../utils/constants.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -66,7 +68,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void logout(BuildContext context) {
+  void logout(BuildContext context) async {
+    await DataRepository()
+        .usersCollection
+        .doc()
+        .update({'tokens': FieldValue.delete()});
     context.read<AuthenticationService>().signOut();
     Navigator.pushReplacementNamed(context, welcomeRoute);
   }

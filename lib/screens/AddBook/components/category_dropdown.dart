@@ -51,11 +51,17 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
-        child: DropdownButton<Category>(
+        child: DropdownButtonFormField<Category>(
           hint: const Text(
             "Select Category",
             style: TextStyle(color: blueButtonColor),
           ),
+          validator: (value) {
+            if (value == null) {
+              return "Select a category";
+            }
+            return null;
+          },
           isExpanded: true,
           onChanged: (value) {
             setState(() {

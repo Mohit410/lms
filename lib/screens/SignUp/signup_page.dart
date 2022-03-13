@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/services/authentication_service.dart';
@@ -19,6 +20,20 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  late FocusNode passwordFocus;
+
+  @override
+  void initState() {
+    passwordFocus = FocusNode();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    passwordFocus.dispose();
+    super.dispose();
+  }
+
   var _isLoading = false;
   final _auth = FirebaseAuth.instance;
 
@@ -33,6 +48,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
 
   final confirmPasswordController = TextEditingController();
+
+  final mobileNoController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +76,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.account_circle),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'First Name',
+          hintText: 'eg. Robert',
+          label: const Text('First Name'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -83,7 +101,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.account_circle),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'Last Name',
+          hintText: 'eg. Patrick',
+          label: const Text('Last Name'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -111,28 +130,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.mail),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'Email',
+          hintText: 'eg. robert@lms.in',
+          label: const Text('Email'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
+    );
+
+    final mobileNoField = TextFormField(
+      controller: mobileNoController,
+      keyboardType: TextInputType.phone,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        FilteringTextInputFormatter.singleLineFormatter
+      ],
+      onSaved: (value) {
+        mobileNoController.text = '+91' + value!;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) {
+        if (value != null && value.length < 10) {
+          return "Enter a valid 10 digit mobile number";
+        }
+        final regex = RegExp(r"^[6-9]\d{9}$");
+        if (!regex.hasMatch(value!)) {
+          return "Enter a valid Indian mobile number";
+        }
+        return null;
+      },
+      autocorrect: false,
+      textInputAction: TextInputAction.next,
+      maxLength: 10,
+      decoration: InputDecoration(
+        prefixText: '+91',
+        prefixIcon: const Icon(Icons.phone_android),
+        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        label: const Text('Mobile Number'),
+        hintText: "   eg.  9824121342",
+        alignLabelWithHint: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
     );
 
     //password field
     final passwordField = TextFormField(
       controller: passwordController,
       autofocus: false,
+      focusNode: passwordFocus,
       keyboardType: TextInputType.visiblePassword,
       obscureText: true,
       onSaved: (value) {
         passwordController.text = value!;
       },
+      maxLength: 10,
       validator: (value) {
         if (value!.isEmpty) {
           return "Password required";
         }
-        RegExp regex = RegExp(r"^.{6,}$");
+        RegExp regex = RegExp(
+            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$");
         if (!regex.hasMatch(value)) {
-          return "Enter valid password(Min. 6 characters)";
+          return "Enter a valid 8 to 10 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!,...]";
         }
         return null;
       },
@@ -140,7 +200,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'Password',
+          helperText: (passwordFocus.hasFocus)
+              ? "Enter a valid 8 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!...]"
+              : null,
+          helperMaxLines: 3,
+          label: const Text('Password'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -151,8 +215,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       controller: confirmPasswordController,
       autofocus: false,
       obscureText: true,
+      maxLength: 10,
+      enabled: true,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
-        if (value!.length < 6 && passwordController.text != value) {
+        if (passwordController.text != value) {
           return "Password don't match";
         }
         return null;
@@ -210,6 +277,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         sizedBoxMargin(20),
                         emailField,
                         sizedBoxMargin(20),
+                        mobileNoField,
+                        sizedBoxMargin(20),
                         passwordField,
                         sizedBoxMargin(20),
                         confirmPasswordField,
@@ -244,9 +313,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           await UserPreferences.saveUserPreferences(user!);
-          admin = isAdmin();
           Navigator.pushNamedAndRemoveUntil(
-              context, homeRoute, (route) => false);
+              context, bottomNavPanelRoute, (route) => false);
         }
         showSnackbar(value, context);
       });
@@ -265,14 +333,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         uid: user.uid,
         firstName: firstNameController.text,
         lastName: lastNameController.text,
+        mobileNumber: mobileNoController.text,
         userRole: "user");
 
     await firebaseFirestore
         .collection("users")
         .doc(user.uid)
         .set(userModel.toMap());
-
-    Navigator.pushNamedAndRemoveUntil(
-        context, bottomNavPanelRoute, (route) => false);
   }
 }

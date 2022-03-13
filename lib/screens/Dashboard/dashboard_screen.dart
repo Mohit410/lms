@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/main.dart';
+import 'package:lms/screens/Dashboard/components/completed_action_card.dart';
 import 'package:lms/utils/user_preferences.dart';
 import '../../model/book_model.dart';
 import '../../repository/data_repository.dart';
@@ -11,14 +12,21 @@ import 'components/request_card.dart';
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({Key? key}) : super(key: key);
 
-  final tabs = [
-    const Tab(text: 'Sent Requests', icon: Icon(Icons.send_rounded)),
-    const Tab(text: 'Inventory', icon: Icon(Icons.inventory_2_rounded)),
+  final readerTabs = [
+    const Tab(text: 'Sent', icon: Icon(Icons.send_rounded)),
+    // const Tab(text: 'Rejected', icon: Icon(Icons.cancel_schedule_send_rounded)),
+    const Tab(text: 'Issued Books', icon: Icon(Icons.inventory_2_rounded)),
+  ];
+
+  final adminTabs = [
+    const Tab(
+        text: 'Pending Actions', icon: Icon(Icons.pending_actions_rounded)),
+    const Tab(text: 'Completed Actions', icon: Icon(Icons.task)),
   ];
 
   @override
   Widget build(BuildContext context) {
-    sentRequestTab(bool isInventory) => StreamBuilder(
+    sentRequestTab(bool isInventory, bool isCompeletedActions) => StreamBuilder(
           stream: DataRepository().getBooksStream(),
           builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
@@ -46,9 +54,13 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                   child: (admin)
-                      ? (book.requestedBy?.uid != null)
-                          ? RequestedCard(book)
-                          : Container()
+                      ? (isCompeletedActions)
+                          ? (book.issuedTo?.uid != null)
+                              ? CompletedActionCard(book)
+                              : Container()
+                          : (book.requestedBy?.uid != null)
+                              ? RequestedCard(book)
+                              : Container()
                       : (isInventory)
                           ? (book.issuedTo?.uid == UserPreferences.getUserUid())
                               ? BookCard(book)
@@ -64,22 +76,26 @@ class DashboardScreen extends StatelessWidget {
         );
 
     return DefaultTabController(
-        length: tabs.length,
+        length: admin ? adminTabs.length : readerTabs.length,
         child: Scaffold(
-          appBar: (admin)
-              ? null
-              : AppBar(
-                  toolbarHeight: 0,
-                  elevation: 0,
-                  backgroundColor: Colors.blue,
-                  bottom: TabBar(
-                    tabs: tabs,
-                  ),
-                ),
+          appBar: AppBar(
+            toolbarHeight: 0,
+            elevation: 0,
+            backgroundColor: Colors.blue,
+            bottom: TabBar(
+              tabs: (admin) ? adminTabs : readerTabs,
+            ),
+          ),
           body: (admin)
-              ? sentRequestTab(false)
+              ? TabBarView(children: [
+                  sentRequestTab(false, false),
+                  sentRequestTab(false, true)
+                ])
               : TabBarView(
-                  children: [sentRequestTab(false), sentRequestTab(true)],
+                  children: [
+                    sentRequestTab(false, false),
+                    sentRequestTab(true, false)
+                  ],
                 ),
         ));
   }

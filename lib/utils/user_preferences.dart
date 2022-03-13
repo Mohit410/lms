@@ -46,6 +46,6 @@ class UserPreferences {
       await UserPreferences.setUserUid("${userModel.uid}");
     });
   }
-}
 
-bool isAdmin() => UserPreferences.getUserRole() == adminR;
+  static bool isAdmin() => UserPreferences.getUserRole() == adminR;
+}

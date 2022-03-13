@@ -51,10 +51,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   }
 
   requestBook() async {
+    if (date == null) {
+      showSnackbar("Please select the return date", context);
+      return;
+    }
     final requestedBy = Reader(
       name:
           "${UserPreferences.getUserFName()} ${UserPreferences.getUserLName()}",
       uid: UserPreferences.getUserUid(),
+      returnDate: "${date!.month}/${date!.day}/${date!.year}",
     );
 
     await DataRepository()
@@ -80,6 +85,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           }
         },
       );
+
+      showSnackbar("This request has been sent to the Admin", context);
+
       await NotificationServices.sendNotification(
         "You have a new book request",
         "${requestedBy.name} has requested for ${book.title}",
@@ -94,16 +102,24 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     await DataRepository()
         .booksCollection
         .doc(book.uid)
-        .update({'requested_by': null});
+        .update({'requested_by': null}).then((value) {
+      setState(() {
+        date = null;
+      });
+    });
   }
 
   approveRequest() async {
-    var reqBy = Reader(uid: book.requestedBy!.uid, name: book.requestedBy!.uid);
+    final reqByUid = book.requestedBy!.uid!;
     await DataRepository().booksCollection.doc(book.uid).update({
       'issued_to': book.requestedBy?.toMap(),
       'requested_by': null,
     }).then((_) async {
-      String userToken = await DataRepository().getUserOSToken(reqBy.uid!);
+      String userToken = "";
+      await DataRepository().getUserOSToken(reqByUid).then((value) {
+        userToken = value;
+        showSnackbar("This request has been approved", context);
+      });
 
       await NotificationServices.sendNotification(
         "Your book request got approved",
@@ -118,10 +134,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     await DataRepository().booksCollection.doc(book.uid).update({
       'requested_by': null,
     }).then((_) async {
-      final userToken = await DataRepository().getUserOSToken(uid!);
+      String userToken = "";
+      await DataRepository().getUserOSToken(uid!).then((value) {
+        userToken = value;
+        showSnackbar("This request has been rejected", context);
+      });
 
       await NotificationServices.sendNotification(
-        "Your book request got declined by ${UserPreferences.getUserFName()}",
+        "Your book request got rejected by ${UserPreferences.getUserFName()}",
         "You can request again for ${book.title}",
         [userToken],
       );
@@ -131,11 +151,34 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   depositeBook() async {
     await DataRepository().booksCollection.doc(book.uid).update({
       'issued_to': null,
+    }).then((_) {
+      setState(() {
+        date = null;
+      });
+      showSnackbar("You have returned the book", context);
     });
   }
 
   onEditClicked() {
     Navigator.pushNamed(context, addBookRoute, arguments: book);
+  }
+
+  DateTime? date;
+
+  Future pickDate(BuildContext context) async {
+    final initialDate = DateTime.now();
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: initialDate,
+      lastDate: DateTime(initialDate.year + 1),
+    );
+
+    if (newDate == null) return;
+
+    setState(() {
+      date = newDate;
+    });
   }
 
   @override
@@ -152,30 +195,46 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
     List<Widget> getBtnList() {
       List<Widget> btnList = [];
+
       checkButtons();
       if (_showRequestBtn) {
+        btnList.add(sizedBoxMargin20());
+        btnList.add(SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: ElevatedButton(
+              onPressed: () {
+                pickDate(context);
+              },
+              child: Text(date == null
+                  ? 'Select Date'
+                  : "${date!.month}/${date!.day}/${date!.year}"),
+            )));
+        btnList.add(sizedBoxMargin(40));
         btnList.add(customButton(
             requestBook, "REQUEST BOOK", context, blueButtonColor));
         btnList.add(sizedBoxMargin20());
       }
       if (_showCancelRequestBtn) {
+        btnList.add(sizedBoxMargin(40));
         btnList.add(customButton(
             cancelRequest, "CANCEL REQUEST", context, redButtonColor));
         btnList.add(sizedBoxMargin20());
       }
       if (_showDepositeBtn) {
+        btnList.add(sizedBoxMargin(40));
         btnList.add(
             customButton(depositeBook, "DEPOSITE", context, redButtonColor));
         btnList.add(sizedBoxMargin20());
       }
       if (_showApproveBtn) {
+        btnList.add(sizedBoxMargin(40));
         btnList.add(customButton(
             approveRequest, "APPROVE REQUEST", context, blueButtonColor));
         btnList.add(sizedBoxMargin20());
       }
       if (_showDeclineBtn) {
         btnList.add(customButton(
-            declineRequest, "DECLINE REQUEST", context, redButtonColor));
+            declineRequest, "REJECT REQUEST", context, redButtonColor));
         btnList.add(sizedBoxMargin20());
       }
 
@@ -235,10 +294,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   sizedBoxMargin10(),
                   fieldText(book.requestedBy?.name ?? ""),
                   sizedBoxMargin20(),
+                  headingText("Will return on: "),
+                  sizedBoxMargin10(),
+                  fieldText(book.requestedBy?.returnDate ?? ""),
+                  sizedBoxMargin20(),
                 ],
               )
             : Container(),
-        const SizedBox(height: 40),
       ];
 
       list.addAll(getBtnList());

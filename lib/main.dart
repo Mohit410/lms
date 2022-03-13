@@ -71,7 +71,7 @@ class AuthWrapper extends StatelessWidget {
     final firebaseUser = context.watch<User?>();
 
     if (firebaseUser != null) {
-      admin = isAdmin();
+      admin = UserPreferences.isAdmin();
       return const BottomNavPanel();
     }
     return const WelcomeScreen();

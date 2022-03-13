@@ -33,7 +33,8 @@ class UserModel {
       'email': email,
       'first_name': firstName,
       'last_name': lastName,
-      'role': userRole
+      'role': userRole,
+      'mobile_no': mobileNumber,
     };
   }
 
@@ -43,7 +44,8 @@ class UserModel {
       'email': email,
       'first_name': firstName,
       'last_name': lastName,
-      'role': userRole
+      'role': userRole,
+      'mobile_no': mobileNumber,
     };
   }
 }

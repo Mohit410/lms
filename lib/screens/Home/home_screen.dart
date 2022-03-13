@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, addBookRoute);
               },
-              label: const Text('Add a book'),
+              label: const Text('Add New Book'),
               icon: const Icon(Icons.add_rounded),
               backgroundColor: Colors.blue,
             )

@@ -26,6 +26,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  late FocusNode passwordFocus;
+
+  @override
+  void initState() {
+    passwordFocus = FocusNode();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    passwordFocus.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     //email field
@@ -58,27 +72,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
     //password field
     final passwordField = TextFormField(
-      autofocus: false,
-      obscureText: true,
       controller: passwordController,
+      autofocus: false,
+      focusNode: passwordFocus,
+      keyboardType: TextInputType.visiblePassword,
+      obscureText: true,
       onSaved: (value) {
         passwordController.text = value!;
       },
+      maxLength: 10,
       validator: (value) {
         if (value!.isEmpty) {
           return "Password required";
         }
-        RegExp regex = RegExp(r"^.{6,}$");
+        RegExp regex = RegExp(
+            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$");
         if (!regex.hasMatch(value)) {
-          return "Enter valid password(Min. 6 characters)";
+          return "Enter a valid 8 to 10 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!,...]";
         }
         return null;
       },
-      textInputAction: TextInputAction.done,
+      textInputAction: TextInputAction.next,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'Password',
+          helperText: (passwordFocus.hasFocus)
+              ? "Enter a valid 8 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!...]"
+              : null,
+          helperMaxLines: 3,
+          label: const Text('Password'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -149,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
         user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           await UserPreferences.saveUserPreferences(user!);
-          admin = isAdmin();
+          admin = UserPreferences.isAdmin();
           Navigator.pushNamedAndRemoveUntil(
               context, bottomNavPanelRoute, (route) => false);
         }

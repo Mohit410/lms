@@ -28,7 +28,6 @@ class _UserDetailState extends State<UserDetail> {
 
   @override
   void initState() {
-    super.initState();
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
       _isLoading = true;
@@ -46,6 +45,7 @@ class _UserDetailState extends State<UserDetail> {
     setState(() {
       _isLoading = false;
     });
+    super.initState();
   }
 
   @override
@@ -71,6 +71,10 @@ class _UserDetailState extends State<UserDetail> {
               headingText("Email"),
               sizedBoxMargin(5),
               fieldText(userModel.email ?? " "),
+              sizedBoxMargin(20),
+              headingText("Mobile Number"),
+              sizedBoxMargin(5),
+              fieldText(userModel.mobileNumber ?? " "),
               sizedBoxMargin(30),
               customButton(
                   widget.onEditClicked, "EDIT", context, blueButtonColor,

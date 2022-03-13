@@ -354,7 +354,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
             )));
 
     addBookToCollection() async {
-      if (_formKey.currentState!.validate()) {
+      if (_formKey.currentState!.validate() && _category != null) {
         setState(() {
           _isLoading = true;
         });
@@ -435,10 +435,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
                             ]),
                         sizedBoxMargin(20),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            const Expanded(
-                                child: Text("Direction",
-                                    style: TextStyle(fontSize: 16))),
+                            Text("Direction", style: TextStyle(fontSize: 16)),
                             directionToggleButtons
                           ],
                         ),
