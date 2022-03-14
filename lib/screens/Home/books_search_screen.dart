@@ -14,25 +14,66 @@ class BooksSearchScreen extends StatefulWidget {
 }
 
 class _BooksSearchScreenState extends State<BooksSearchScreen> {
+  final searchController = TextEditingController();
+
+  String searchQuery = "";
+
+  getSearchedList(QuerySnapshot<Object?> data) {
+    final queryString = searchQuery.toLowerCase();
+    return data.docs
+        .map((e) {
+          if ((e.get('title') as String).toLowerCase().contains(queryString)) {
+            return e;
+          } else if ((e.get('authors') as List).any((element) =>
+              (element as String).toLowerCase().contains(queryString))) {
+            return e;
+          } else if ((e.get('tags') as List).any((element) =>
+              (element as String).toLowerCase().contains(queryString))) {
+            return e;
+          } else if (e.get('issued_to') != null) {
+            if (((e.get('issued_to') as Map)['name'] as String)
+                .toLowerCase()
+                .contains(queryString)) {
+              return e;
+            }
+          } else if (e.get('requested_by') != null) {
+            if (((e.get('requested_by') as Map)['name'] as String)
+                .toLowerCase()
+                .contains(queryString)) {
+              return e;
+            }
+          }
+        })
+        .where((element) => element != null)
+        .toList();
+  }
+
   getBooksStreamWidget() => StreamBuilder(
         stream: DataRepository().getBooksStream(),
         builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return const Text('Something went wrong');
+            return const Center(child: Text('Something went wrong'));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
-          final data = snapshot.requireData;
+
+          if (snapshot.data?.size == 0) {
+            return const Center(
+              child: Text("No Books Available"),
+            );
+          }
+
+          final list = getSearchedList(snapshot.requireData);
 
           return ListView.builder(
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
             padding: const EdgeInsets.all(8),
-            itemCount: data.size,
+            itemCount: list.length,
             itemBuilder: ((context, index) {
-              final book = Book.fromMap(data.docs[index].data());
+              final book = Book.fromMap(list[index]!.data());
               return GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(
@@ -54,7 +95,7 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));
           }
-          if (!snapshot.hasError && snapshot.data?.size == 0) {
+          if (snapshot.data?.size == 0) {
             return const Center(
               child: Text("No Books Available"),
             );
@@ -62,16 +103,17 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          final data = snapshot.requireData;
+
+          final list = getSearchedList(snapshot.requireData);
 
           return ListView.builder(
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
             padding: const EdgeInsets.all(8),
-            itemCount: data.size,
+            itemCount: list.length,
             itemBuilder: ((context, index) {
-              final book = Book.fromMap(data.docs[index].data());
+              final book = Book.fromMap(list[index]!.data());
               return GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(
@@ -97,9 +139,34 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
               backgroundColor: Colors.blue,
             )
           : null,
-      body: (category == null)
-          ? getBooksStreamWidget()
-          : getBooksStreamByCategoryWidget(category),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              textInputAction: TextInputAction.search,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                  hintText: "Search Books",
+                  hintStyle: const TextStyle(color: Colors.white),
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8))),
+              controller: searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: (category == null)
+                ? getBooksStreamWidget()
+                : getBooksStreamByCategoryWidget(category),
+          )
+        ],
+      ),
     );
   }
 }

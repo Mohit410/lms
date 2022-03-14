@@ -37,15 +37,4 @@ class UserModel {
       'mobile_no': mobileNumber,
     };
   }
-
-  toJson() {
-    return {
-      'uid': uid,
-      'email': email,
-      'first_name': firstName,
-      'last_name': lastName,
-      'role': userRole,
-      'mobile_no': mobileNumber,
-    };
-  }
 }

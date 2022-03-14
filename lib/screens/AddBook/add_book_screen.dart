@@ -399,6 +399,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text((book == null) ? "Add New Book" : "Edit Book"),
+        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: (_isLoading)
@@ -437,7 +438,8 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text("Direction", style: TextStyle(fontSize: 16)),
+                            const Text("Direction",
+                                style: TextStyle(fontSize: 16)),
                             directionToggleButtons
                           ],
                         ),

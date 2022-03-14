@@ -9,7 +9,6 @@ import 'package:lms/utils/helper.dart';
 // ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 
-import '../../main.dart';
 import '../../utils/user_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {

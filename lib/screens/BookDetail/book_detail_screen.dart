@@ -181,6 +181,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     });
   }
 
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final _bookUid = ModalRoute.of(context)!.settings.arguments as String;
@@ -241,6 +243,36 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       return btnList;
     }
 
+    showReaderDetails(String uid) async {
+      UserModel? user;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get()
+          .then((doc) {
+        user = UserModel.fromMap(doc.data());
+        scaffoldKey.currentState!.showBottomSheet(
+            (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.person_rounded),
+                      title: Text("${user!.firstName} ${user!.lastName}"),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.email_rounded),
+                      title: Text("${user!.email}"),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.phone_android_rounded),
+                      title: Text("${user!.mobileNumber}"),
+                    )
+                  ],
+                ),
+            enableDrag: true);
+      });
+    }
+
     List<Widget> getBookDetailsList(Book book) {
       String authors = "";
       for (var author in book.authors!) {
@@ -277,7 +309,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 children: [
                   headingText("Issued To"),
                   sizedBoxMargin10(),
-                  fieldText(book.issuedTo?.name ?? ""),
+                  GestureDetector(
+                    onTap: () {
+                      if (admin) {
+                        showReaderDetails(book.issuedTo!.uid!);
+                      }
+                    },
+                    child: coloredFieldText(book.issuedTo?.name ?? ""),
+                  ),
                   sizedBoxMargin20(),
                   headingText("Will be returned on: "),
                   sizedBoxMargin10(),
@@ -292,7 +331,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 children: [
                   headingText("Requested By"),
                   sizedBoxMargin10(),
-                  fieldText(book.requestedBy?.name ?? ""),
+                  GestureDetector(
+                    onTap: () {
+                      if (admin) {
+                        showReaderDetails(book.requestedBy!.uid!);
+                      }
+                    },
+                    child: coloredFieldText(book.requestedBy?.name ?? ""),
+                  ),
                   sizedBoxMargin20(),
                   headingText("Will return on: "),
                   sizedBoxMargin10(),
@@ -309,6 +355,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: const Text("Book Details"),
         backgroundColor: Colors.blue,

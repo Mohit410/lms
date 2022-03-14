@@ -20,6 +20,16 @@ fieldText(String value) => Text(
       textAlign: TextAlign.start,
     );
 
+coloredFieldText(String value) => Text(
+      value,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.blue.shade400,
+      ),
+      textAlign: TextAlign.start,
+    );
+
 customButton(
         VoidCallback onPressed, String lable, BuildContext context, Color color,
         {Icon? icon}) =>
