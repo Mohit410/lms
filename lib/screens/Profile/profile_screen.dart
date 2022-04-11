@@ -5,6 +5,7 @@ import 'package:lms/screens/Profile/user_details.dart';
 import 'package:lms/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 import '../../utils/constants.dart';
+import '../../utils/user_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -67,7 +68,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void logout(BuildContext context) async {
-    context.read<AuthenticationService>().signOut();
+    await context.read<AuthenticationService>().signOut();
+    await UserPreferences.clearPreferences();
     Navigator.pushReplacementNamed(context, welcomeRoute);
   }
 }

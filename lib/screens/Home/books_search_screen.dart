@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
 import '../../model/book_model.dart';
 import '../../utils/constants.dart';
@@ -89,8 +88,8 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
         }),
       );
 
-  getBooksStreamByCategoryWidget(Category category) => StreamBuilder(
-        stream: DataRepository().getBooksStreamByCategory(category.uid!),
+  getBooksStreamByCategoryWidget(String category) => StreamBuilder(
+        stream: DataRepository().getBooksStreamByCategory(category),
         builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));
@@ -131,11 +130,11 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final category = ModalRoute.of(context)?.settings.arguments as Category?;
+    final category = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       appBar: (category != null)
           ? AppBar(
-              title: Text("${category.title} Books"),
+              title: Text("$category Books"),
               backgroundColor: Colors.blue,
             )
           : null,

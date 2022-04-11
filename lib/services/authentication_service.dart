@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../utils/user_preferences.dart';
-
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
 
@@ -39,7 +37,6 @@ class AuthenticationService {
   Future<String> signOut() async {
     try {
       await _firebaseAuth.signOut();
-      await UserPreferences.clearPreferences();
       return "Signed out";
     } on FirebaseAuthException catch (e) {
       return "${e.message}";

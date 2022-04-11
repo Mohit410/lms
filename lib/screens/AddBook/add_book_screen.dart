@@ -1,79 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lms/model/book_location.dart';
 import 'package:lms/model/book_model.dart';
-import 'package:lms/model/category_model.dart';
 import 'package:lms/repository/data_repository.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/helper.dart';
+import 'package:lms/widgets/drop_down_widget.dart';
+import 'package:lms/widgets/location_textfield.dart';
 
 class AddBookScreen extends StatefulWidget {
-  const AddBookScreen({Key? key}) : super(key: key);
+  final Book? book;
+  const AddBookScreen({Key? key, required this.book}) : super(key: key);
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
 }
 
 class _AddBookScreenState extends State<AddBookScreen> {
-  Book? book = Book();
-
+  Book? _book;
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _category = book?.category;
-    });
-    getCategoryList();
     tagsFocusNode = FocusNode();
     authorsFocusNode = FocusNode();
-  }
+    _book = widget.book;
 
-  @override
-  void didChangeDependencies() {
-    book = ModalRoute.of(context)?.settings.arguments as Book?;
-    if (book != null) {
-      bookTitleController.text = book!.title!;
-      rackController.text = book!.bookLocation!.rackNo!;
-      rowController.text = book!.bookLocation!.rowNo!;
-      positionController.text = book!.bookLocation!.position!;
-      _direction = book!.bookLocation!.direction!;
-      _tagList = book!.tags!;
-      _authorsList = book!.authors!;
+    if (_book != null) {
+      bookTitleController.text = _book!.title!;
+      rackController.text = _book!.bookLocation!.rackNo!;
+      rowController.text = _book!.bookLocation!.rowNo!;
+      positionController.text = _book!.bookLocation!.position!;
+      _direction = _book!.bookLocation!.direction!;
+      _tagList = _book!.tags!;
+      _authorsList = _book!.authors!;
+      _category = _book!.category!;
     }
-    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     tagsFocusNode.dispose();
     authorsFocusNode.dispose();
+    bookTitleController.dispose();
+    authorController.dispose();
+    tagsController.dispose();
+    rackController.dispose();
+    rowController.dispose();
+    positionController.dispose();
     super.dispose();
-  }
-
-  getCategoryList() async {
-    await getCategories().then((value) {
-      setState(() {
-        _categoryList = value;
-      });
-    });
   }
 
   var _isLoading = false;
 
   List<String> _tagList = [];
   List<String> _authorsList = [];
-  List<Category> _categoryList = [];
-  Category? _category;
+  String? _category;
 
   final _formKey = GlobalKey<FormState>();
-
-  Future<List<Category>> getCategories() async {
-    var qShot = await DataRepository().categoriesCollection.get();
-
-    return qShot.docs
-        .map((doc) => Category(uid: doc.get('uid'), title: doc.get('title')))
-        .toList();
-  }
 
   final bookTitleController = TextEditingController(text: "");
   final authorController = TextEditingController();
@@ -100,6 +82,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
       onSaved: (value) {
         bookTitleController.text = value!;
       },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value!.isEmpty) return "Title cannot be empty";
         if (value.length < 3) {
@@ -112,84 +95,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
         contentPadding: EdgeInsets.zero,
         label: const Text("Title"),
         hintText: "Enter Book Title",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    final rackField = TextFormField(
-      controller: rackController,
-      textInputAction: TextInputAction.next,
-      autofocus: false,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      textAlign: TextAlign.center,
-      keyboardType: TextInputType.number,
-      onSaved: (value) {
-        rackController.text = value!;
-      },
-      validator: (value) {
-        if (value!.isEmpty) return "Rack No. cannot be empty";
-        return null;
-      },
-      decoration: InputDecoration(
-        floatingLabelAlignment: FloatingLabelAlignment.center,
-        alignLabelWithHint: true,
-        contentPadding: EdgeInsets.zero,
-        label: const Text("Rack No"),
-        hintText: "eg. 8",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    final rowField = TextFormField(
-      controller: rowController,
-      textInputAction: TextInputAction.next,
-      autofocus: false,
-      textAlign: TextAlign.center,
-      keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      onSaved: (value) {
-        rowController.text = value!;
-      },
-      validator: (value) {
-        if (value!.isEmpty) return "Row cannot be empty";
-        return null;
-      },
-      decoration: InputDecoration(
-        floatingLabelAlignment: FloatingLabelAlignment.center,
-        alignLabelWithHint: true,
-        contentPadding: EdgeInsets.zero,
-        label: const Text("Row No."),
-        hintText: "eg. 3",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    final positionField = TextFormField(
-      controller: positionController,
-      textInputAction: TextInputAction.next,
-      autofocus: false,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      keyboardType: TextInputType.number,
-      textAlign: TextAlign.center,
-      onSaved: (value) {
-        positionController.text = value!;
-      },
-      validator: (value) {
-        if (value!.isEmpty) return "Position cannot be empty";
-        return null;
-      },
-      decoration: InputDecoration(
-        floatingLabelAlignment: FloatingLabelAlignment.center,
-        alignLabelWithHint: true,
-        contentPadding: EdgeInsets.zero,
-        label: const Text("Position"),
-        hintText: "eg. 12",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -235,6 +140,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         if (_tagList.isEmpty) return "Tags cannot be empty";
         return null;
       },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.tag_rounded),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -281,6 +187,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         authorController.text = "";
         authorsFocusNode.requestFocus();
       },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (_) {
         if (_authorsList.isEmpty) return "Author cannot be empty";
         return null;
@@ -304,14 +211,14 @@ class _AddBookScreenState extends State<AddBookScreen> {
             child: Text(
               "Left to Right",
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 1),
             )),
         Padding(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
               "Right to Left",
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 1),
             )),
       ],
       isSelected: _directionsList.map((e) => e == _direction).toList(),
@@ -322,48 +229,19 @@ class _AddBookScreenState extends State<AddBookScreen> {
       },
     );
 
-    final categoryDropdownBtn = Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: DropdownButton<Category>(
-              underline: Container(),
-              isExpanded: true,
-              items: _categoryList.map<DropdownMenuItem<Category>>((cate) {
-                return DropdownMenuItem<Category>(
-                  value: cate,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.55,
-                    child: Text(
-                      "${cate.title}",
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              }).toList(),
-              value: _category,
-              onChanged: (value) {
-                setState(() {
-                  _category = value;
-                });
-              },
-            )));
+    // validating function
 
     addBookToCollection() async {
       if (_formKey.currentState!.validate() && _category != null) {
         setState(() {
           _isLoading = true;
         });
-        Book _book = Book(
-          uid: (book == null) ? "uid" : book!.uid,
+        Book book = Book(
+          uid: (_book == null) ? "uid" : _book!.uid,
           title: bookTitleController.text,
           authors: _authorsList.toSet().toList(),
           tags: _tagList.toSet().toList(),
-          category: _category!,
+          category: _category,
           bookLocation: BookLocation(
               rackNo: rackController.text,
               rowNo: rowController.text,
@@ -371,34 +249,37 @@ class _AddBookScreenState extends State<AddBookScreen> {
               direction: _direction),
         );
 
-        final result = (book == null)
-            ? DataRepository().addBook(_book)
-            : DataRepository().updateBook(_book);
+        final result = (_book == null)
+            ? DataRepository().addBook(book)
+            : DataRepository().updateBook(book);
 
         await result.then(
           (value) {
-            setState(() {
-              _isLoading = false;
-            });
             showSnackbar(
-                (book == null)
+                (_book == null)
                     ? "Book added successfully"
                     : "Book Updated Successfully",
                 context);
             Navigator.pop(context);
           },
         ).catchError((error) {
-          setState(() {
-            _isLoading = false;
-          });
           showSnackbar("Something went wrong", context);
         });
       }
+      setState(() {
+        _isLoading = false;
+      });
+    }
+
+    void onCategoryChanged(String value) {
+      setState(() {
+        _category = value;
+      });
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text((book == null) ? "Add New Book" : "Edit Book"),
+        title: Text((_book == null) ? "Add New Book" : "Edit Book"),
         backgroundColor: Colors.blue,
       ),
       body: Center(
@@ -414,7 +295,25 @@ class _AddBookScreenState extends State<AddBookScreen> {
                       children: <Widget>[
                         titleField,
                         sizedBoxMargin(20),
-                        categoryDropdownBtn,
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: const Text("Category"),
+                        ),
+                        sizedBoxMargin(10),
+                        CustomDropDownFormField(
+                          itemList: categoryList,
+                          onItemChanged: (value) {
+                            onCategoryChanged(value);
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please select a category";
+                            }
+                            return null;
+                          },
+                          currentValue: _category,
+                          hint: "Select A Category",
+                        ),
                         sizedBoxMargin(20),
                         authorListContainer,
                         sizedBoxMargin(8),
@@ -428,11 +327,19 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Expanded(child: rackField),
+                              Expanded(
+                                  child: LocationTextField(
+                                      controller: rackController,
+                                      lable: "Rack")),
                               const SizedBox(width: 10),
-                              Expanded(child: rowField),
+                              Expanded(
+                                  child: LocationTextField(
+                                      controller: rowController, lable: "Row")),
                               const SizedBox(width: 10),
-                              Expanded(child: positionField)
+                              Expanded(
+                                  child: LocationTextField(
+                                      controller: positionController,
+                                      lable: "Position"))
                             ]),
                         sizedBoxMargin(20),
                         Row(

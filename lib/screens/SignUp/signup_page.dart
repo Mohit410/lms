@@ -34,6 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   var _isLoading = false;
+  bool _isPasswordVisible = false, _isConfirmPasswordVisible = false;
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
@@ -179,7 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       autofocus: false,
       focusNode: passwordFocus,
       keyboardType: TextInputType.visiblePassword,
-      obscureText: true,
+      obscureText: !_isPasswordVisible,
       onSaved: (value) {
         passwordController.text = value!;
       },
@@ -204,6 +205,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               : null,
           helperMaxLines: 3,
           label: const Text('Password'),
+          suffixIcon: IconButton(
+            onPressed: () => setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            }),
+            icon: Icon(!_isPasswordVisible
+                ? Icons.visibility_rounded
+                : Icons.visibility_off_rounded),
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -213,7 +222,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final confirmPasswordField = TextFormField(
       controller: confirmPasswordController,
       autofocus: false,
-      obscureText: true,
+      obscureText: !_isConfirmPasswordVisible,
       maxLength: 10,
       enabled: true,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -231,6 +240,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: 'Confirm Password',
+          suffixIcon: IconButton(
+            onPressed: () => setState(() {
+              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+            }),
+            icon: Icon(!_isConfirmPasswordVisible
+                ? Icons.visibility_rounded
+                : Icons.visibility_off_rounded),
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           )),
@@ -304,8 +321,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await context
           .read<AuthenticationService>()
           .signUp(
-            email: email,
-            password: password,
+            email: email.trim(),
+            password: password.trim(),
           )
           .then((value) async {
         await postUserDetailsToFirestore(context);

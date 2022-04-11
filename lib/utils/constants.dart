@@ -6,6 +6,14 @@ void showSnackbar(String message, BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
+// category list
+final List<String> categoryList = [
+  "Mechanical",
+  "Chemical",
+  "Civil",
+  "Computer Science"
+];
+
 // Routes Constants
 const welcomeRoute = "\welcome";
 const loginRoute = "\login";

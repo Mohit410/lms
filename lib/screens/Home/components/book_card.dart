@@ -35,7 +35,7 @@ class BookCard extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            Text("Category: ${_book.category?.title}",
+            Text("Category: ${_book.category}",
                 style: const TextStyle(
                     fontWeight: FontWeight.normal, fontSize: 14)),
             const SizedBox(

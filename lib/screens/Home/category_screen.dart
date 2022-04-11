@@ -1,9 +1,45 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/model/category_model.dart';
-import 'package:lms/repository/data_repository.dart';
 import 'package:lms/utils/constants.dart';
 
+class CategoryScreen extends StatelessWidget {
+  const CategoryScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: null,
+      body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              child: const Center(
+                child: Text(
+                  "Select A Category",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              width: MediaQuery.of(context).size.width,
+            ),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              padding: const EdgeInsets.all(20),
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              children: categoryList.map((category) {
+                return CategoryCard(category: category);
+              }).toList(),
+            )
+          ]),
+    );
+  }
+}
+/* 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({Key? key}) : super(key: key);
 
@@ -19,7 +55,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Category? category;
+    String? category;
     return Scaffold(
         appBar: null,
         body: Column(
@@ -68,7 +104,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ),
                   itemCount: data.size,
                   itemBuilder: (context, index) {
-                    category = Category.fromMap(data.docs[index]);
+                    category = data.docs[index]);
                     return CategoryCard(category!);
                   },
                 );
@@ -78,16 +114,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ));
   }
 }
+*/
 
-class CategoryCard extends StatefulWidget {
-  final Category category;
-  const CategoryCard(this.category, {Key? key}) : super(key: key);
+class CategoryCard extends StatelessWidget {
+  final String category;
+  const CategoryCard({required this.category, Key? key}) : super(key: key);
 
-  @override
-  State<CategoryCard> createState() => _CategoryCardState();
-}
-
-class _CategoryCardState extends State<CategoryCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -95,7 +127,7 @@ class _CategoryCardState extends State<CategoryCard> {
         Navigator.pushNamed(
           context,
           booksListRoute,
-          arguments: widget.category,
+          arguments: category,
         );
       },
       child: Card(
@@ -103,7 +135,7 @@ class _CategoryCardState extends State<CategoryCard> {
           padding: const EdgeInsets.all(8),
           child: Center(
             child: Text(
-              widget.category.title!,
+              category,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,

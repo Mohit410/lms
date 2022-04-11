@@ -13,11 +13,11 @@ class DataRepository {
 
   Stream<QuerySnapshot> getUsersStream() => usersCollection.snapshots();
 
-  Stream<QuerySnapshot> getBooksStreamByCategory(String categoryUid) =>
+  Stream<QuerySnapshot> getBooksStreamByCategory(String category) =>
       booksCollection
           .where(
-            'category.uid',
-            isEqualTo: categoryUid,
+            'category',
+            isEqualTo: category,
           )
           .snapshots();
 

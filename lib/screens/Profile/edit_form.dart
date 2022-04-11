@@ -5,11 +5,11 @@ import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/helper.dart';
 
 class EditForm extends StatefulWidget {
-  UserModel userModel = UserModel();
+  final UserModel userModel;
   final VoidCallback onSaveClicked;
   final VoidCallback onCancelClicked;
 
-  EditForm({
+  const EditForm({
     Key? key,
     required this.userModel,
     required this.onSaveClicked,

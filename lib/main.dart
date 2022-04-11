@@ -54,7 +54,9 @@ class MyApp extends StatelessWidget {
           homeRoute: (_) => const HomeScreen(),
           profileRoute: (_) => const ProfileScreen(),
           notificationRoute: (_) => DashboardScreen(),
-          addBookRoute: (_) => const AddBookScreen(),
+          addBookRoute: (_) => const AddBookScreen(book: null),
+
+          /// need to be resolved asap
           bookDetailRoute: (_) => const BookDetailScreen(),
           booksListRoute: (_) => const BooksSearchScreen(),
         },
@@ -71,7 +73,6 @@ class AuthWrapper extends StatelessWidget {
     final firebaseUser = context.watch<User?>();
 
     if (firebaseUser != null) {
-      admin = UserPreferences.isAdmin();
       return const BottomNavPanel();
     }
     return const WelcomeScreen();

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lms/main.dart';
 import 'package:lms/screens/Dashboard/dashboard_screen.dart';
 import 'package:lms/screens/Home/home_screen.dart';
 import 'package:lms/screens/Profile/profile_screen.dart';
 import 'package:lms/services/authentication_service.dart';
+import 'package:lms/utils/user_preferences.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../utils/constants.dart';
@@ -25,6 +27,7 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
   @override
   void initState() {
     super.initState();
+    admin = UserPreferences.isAdmin();
     initPlateformState();
   }
 

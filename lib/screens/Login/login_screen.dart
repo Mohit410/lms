@@ -28,6 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   late FocusNode passwordFocus;
 
+  bool _isPasswordVisible = false;
+
   @override
   void initState() {
     passwordFocus = FocusNode();
@@ -76,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
       autofocus: false,
       focusNode: passwordFocus,
       keyboardType: TextInputType.visiblePassword,
-      obscureText: true,
+      obscureText: !_isPasswordVisible,
       onSaved: (value) {
         passwordController.text = value!;
       },
@@ -100,6 +102,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ? "Enter a valid 8 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!...]"
               : null,
           helperMaxLines: 3,
+          suffixIcon: IconButton(
+            onPressed: () => setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            }),
+            icon: Icon(!_isPasswordVisible
+                ? Icons.visibility_rounded
+                : Icons.visibility_off_rounded),
+          ),
           label: const Text('Password'),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

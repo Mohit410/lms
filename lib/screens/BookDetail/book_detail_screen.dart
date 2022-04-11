@@ -6,6 +6,7 @@ import 'package:lms/model/book_model.dart';
 import 'package:lms/model/reader_model.dart';
 import 'package:lms/model/user_model.dart';
 import 'package:lms/repository/data_repository.dart';
+import 'package:lms/screens/AddBook/add_book_screen.dart';
 import 'package:lms/services/notification_services.dart';
 import 'package:lms/utils/constants.dart';
 import 'package:lms/utils/helper.dart';
@@ -32,6 +33,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   bool _showCancelRequestBtn = false;
   bool _showDepositeBtn = false;
 
+  var _isLoading = false;
+
   void checkButtons() {
     if (admin) {
       _showApproveBtn = book.requestedBy != null;
@@ -55,6 +58,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       showSnackbar("Please select the return date", context);
       return;
     }
+    setState(() {
+      _isLoading = true;
+    });
     final requestedBy = Reader(
       name:
           "${UserPreferences.getUserFName()} ${UserPreferences.getUserLName()}",
@@ -88,28 +94,46 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
       showSnackbar("This request has been sent to the Admin", context);
 
-      await NotificationServices.sendNotification(
-        "You have a new book request",
-        "${requestedBy.name} has requested for ${book.title}",
-        adminsTokenList,
-      );
+      if (adminsTokenList.isNotEmpty) {
+        await NotificationServices.sendNotification(
+          "You have a new book request",
+          "${requestedBy.name} has requested for ${book.title}",
+          adminsTokenList,
+        );
+      }
     });
 
     checkButtons();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   cancelRequest() async {
+    setState(() {
+      _isLoading = true;
+    });
     await DataRepository()
         .booksCollection
         .doc(book.uid)
-        .update({'requested_by': null}).then((value) {
+        .update({'requested_by': null}).then((_) {
       setState(() {
         date = null;
       });
     });
+
+    showSnackbar("You have successfully revoked your request", context);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   approveRequest() async {
+    setState(() {
+      _isLoading = true;
+    });
     final reqByUid = book.requestedBy!.uid!;
     await DataRepository().booksCollection.doc(book.uid).update({
       'issued_to': book.requestedBy?.toMap(),
@@ -127,9 +151,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         [userToken],
       );
     });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   declineRequest() async {
+    setState(() {
+      _isLoading = true;
+    });
     var uid = book.requestedBy!.uid;
     await DataRepository().booksCollection.doc(book.uid).update({
       'requested_by': null,
@@ -146,9 +177,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         [userToken],
       );
     });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   depositeBook() async {
+    setState(() {
+      _isLoading = true;
+    });
     await DataRepository().booksCollection.doc(book.uid).update({
       'issued_to': null,
     }).then((_) {
@@ -157,10 +195,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       });
       showSnackbar("You have returned the book", context);
     });
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   onEditClicked() {
-    Navigator.pushNamed(context, addBookRoute, arguments: book);
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => AddBookScreen(book: book)));
   }
 
   DateTime? date;
@@ -292,7 +334,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         sizedBoxMargin20(),
         headingText("Category"),
         sizedBoxMargin10(),
-        fieldText(book.category?.title ?? " "),
+        fieldText(book.category ?? " "),
         sizedBoxMargin20(),
         headingText("Availability"),
         sizedBoxMargin10(),
@@ -371,37 +413,41 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             )
           : null,
       body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: StreamBuilder<DocumentSnapshot>(
-              stream:
-                  DataRepository().booksCollection.doc(_bookUid).snapshots(),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasError) {
-                  return const Text("Something went wrong");
-                }
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: StreamBuilder<DocumentSnapshot>(
+                    stream: DataRepository()
+                        .booksCollection
+                        .doc(_bookUid)
+                        .snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasError) {
+                        return const Text("Something went wrong");
+                      }
 
-                if (snapshot.hasData && !snapshot.data!.exists) {
-                  return const Text("Book does not exist");
-                }
+                      if (snapshot.hasData && !snapshot.data!.exists) {
+                        return const Text("Book does not exist");
+                      }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
 
-                var map = snapshot.data!.data() as Map<String, dynamic>;
-                book = Book.fromMap(map);
+                      var map = snapshot.data!.data() as Map<String, dynamic>;
+                      book = Book.fromMap(map);
 
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: getBookDetailsList(book),
-                );
-              },
-            ),
-          ),
-        ),
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: getBookDetailsList(book),
+                      );
+                    },
+                  ),
+                ),
+              ),
       ),
     );
   }

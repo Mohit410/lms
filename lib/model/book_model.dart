@@ -1,4 +1,3 @@
-import 'package:lms/model/category_model.dart';
 import 'package:lms/model/reader_model.dart';
 
 import 'book_location.dart';
@@ -8,7 +7,7 @@ class Book {
   String? title;
   List<String>? authors;
   List<String>? tags;
-  Category? category;
+  String? category;
   Reader? issuedTo;
   Reader? requestedBy;
   BookLocation? bookLocation;
@@ -38,7 +37,7 @@ class Book {
       uid: map['uid'],
       title: map['title'],
       authors: List.from(map['authors']),
-      category: Category.fromMap(map['category']),
+      category: map['category'],
     );
   }
 
@@ -47,7 +46,7 @@ class Book {
         'title': title,
         'authors': authors,
         'tags': tags,
-        'category': category?.toMap(),
+        'category': category,
         'issued_to': issuedTo?.toMap(),
         'requested_by': requestedBy?.toMap(),
         'location': bookLocation?.toMap()
