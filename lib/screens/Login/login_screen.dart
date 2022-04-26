@@ -87,21 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
         if (value!.isEmpty) {
           return "Password required";
         }
-        RegExp regex = RegExp(
-            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$");
-        if (!regex.hasMatch(value)) {
-          return "Enter a valid 8 to 10 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!,...]";
-        }
         return null;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          helperText: (passwordFocus.hasFocus)
-              ? "Enter a valid 8 digit password that contains atleast one capital letter[A-Z], one digit[0-9], and one special character [#,@,\$,&,!...]"
-              : null,
-          helperMaxLines: 3,
           suffixIcon: IconButton(
             onPressed: () => setState(() {
               _isPasswordVisible = !_isPasswordVisible;
