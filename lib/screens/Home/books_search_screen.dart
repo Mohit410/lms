@@ -17,6 +17,20 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
 
   String searchQuery = "";
 
+  late FocusNode searchFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    searchFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    searchFocusNode.dispose();
+    super.dispose();
+  }
+
   getSearchedList(QuerySnapshot<Object?> data) {
     final queryString = searchQuery.toLowerCase();
     return data.docs
@@ -75,6 +89,7 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
               final book = Book.fromMap(list[index]!.data());
               return GestureDetector(
                 onTap: () {
+                  searchFocusNode.unfocus();
                   Navigator.pushNamed(
                     context,
                     bookDetailRoute,
@@ -115,6 +130,7 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
               final book = Book.fromMap(list[index]!.data());
               return GestureDetector(
                 onTap: () {
+                  searchFocusNode.unfocus();
                   Navigator.pushNamed(
                     context,
                     bookDetailRoute,
@@ -144,6 +160,7 @@ class _BooksSearchScreenState extends State<BooksSearchScreen> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               textInputAction: TextInputAction.search,
+              focusNode: searchFocusNode,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                   hintText: "Search Books",

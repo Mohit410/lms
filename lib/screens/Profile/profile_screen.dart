@@ -3,6 +3,7 @@ import 'package:lms/model/user_model.dart';
 import 'package:lms/screens/Profile/edit_form.dart';
 import 'package:lms/screens/Profile/user_details.dart';
 import 'package:lms/services/authentication_service.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../utils/constants.dart';
 import '../../utils/user_preferences.dart';
@@ -68,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void logout(BuildContext context) async {
+    await OneSignal.shared.disablePush(true);
     await context.read<AuthenticationService>().signOut();
     await UserPreferences.clearPreferences();
     Navigator.pushReplacementNamed(context, welcomeRoute);

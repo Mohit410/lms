@@ -33,6 +33,7 @@ class _BottomNavPanelState extends State<BottomNavPanel> {
 
   initPlateformState() async {
     await OneSignal.shared.setAppId(appId);
+    await OneSignal.shared.disablePush(false);
 
     var deviceState = await OneSignal.shared.getDeviceState();
 
