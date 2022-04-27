@@ -211,14 +211,14 @@ class _AddBookScreenState extends State<AddBookScreen> {
             child: Text(
               "Left to Right",
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 1),
+                  fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1),
             )),
         Padding(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
               "Right to Left",
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 1),
+                  fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1),
             )),
       ],
       isSelected: _directionsList.map((e) => e == _direction).toList(),
@@ -343,11 +343,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
                             ]),
                         sizedBoxMargin(20),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text("Direction",
                                 style: TextStyle(fontSize: 16)),
-                            directionToggleButtons
+                            directionToggleButtons,
                           ],
                         ),
                         sizedBoxMargin(20),
